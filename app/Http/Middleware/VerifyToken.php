@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\Controller;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -12,13 +13,13 @@ class VerifyToken
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param Closure(Request): (Response) $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         if(
             !$request->header('token') ||
-            !$this->verify($request->header('token'))
+            !$this->verify($request->header('token'), $request)
         ) {
             return $this->fail();
         }
@@ -28,21 +29,29 @@ class VerifyToken
     protected function fail(): Response
     {
         return response()->json([
-            'code' => Response::HTTP_UNAUTHORIZED,
-            'message' => 'token is required'
+            'code' => Controller::CODE_UNAUTHORIZED,
+            'message' => 'UNAUTHORIZED'
         ], Response::HTTP_UNAUTHORIZED);
     }
 
     protected function verify(string $token): bool
     {
-        $expireTime = env('token_expire_time', 3600);
+        $expireTime = env('TOKEN_EXPIRE_TIME', 3600);
         $tokenKey = "token:$token";
         $expireAt = Redis::get($tokenKey)['expire_at'] ?? 0;
         if($expireAt < time()) {
             Redis::del($tokenKey);
             return false;
         }
+        $this->exportToken($token);
         Redis::expire($tokenKey, $expireTime);
         return true;
+    }
+
+    protected function exportToken($token): void
+    {
+        app()->singleton('token', function() use ($token) {
+            return $token;
+        });
     }
 }

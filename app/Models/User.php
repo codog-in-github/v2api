@@ -36,4 +36,9 @@ class User extends Authenticatable
         return $this->hasMany(UserEmail::class);
     }
 
+
+    public static function userLogin(string $usr, string $pwd) {
+        return self::where('usr', $usr)->where('pwd', $pwd)->first();
+    }
+
 }

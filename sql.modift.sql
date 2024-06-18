@@ -31,5 +31,5 @@ create table v2_user_email
 );
 
 create index v2_user_email_user_id_index
-    on v2_user_email (user_id);
+    on v2_user_emails (user_id);
 
