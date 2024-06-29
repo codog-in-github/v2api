@@ -24,6 +24,6 @@ Route::group([
         //需要登录的接口
         'middleware' => []
     ], function () {
-
+        Route::post('upload_file', 'FileController@upload');
     });
 });
