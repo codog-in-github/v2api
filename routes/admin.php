@@ -18,13 +18,11 @@ Route::group([
     'prefix' => 'admin'
 ], function () {
     //后台登录
-    Route::post('login', 'UserController@login');
+    Route::post('login', 'UserController@login')->name('login');
 
     Route::group([
         //需要登录的接口
-        'namespace' => 'Admin',
-        'prefix' => 'admin',
-        'middleware' => [ 'auth_user' ]
+        'middleware' => []
     ], function () {
 
     });

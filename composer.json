@@ -12,6 +12,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "phpoffice/phpspreadsheet": "^1.12",
+        "predis/predis": "^2.2",
         "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
