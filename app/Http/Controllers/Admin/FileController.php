@@ -19,7 +19,7 @@ class FileController extends Controller
             }
             $file->storeAs($dir, $fileName, 'public');
             return $this->success([
-                'url' => env('app_url') . '/' . $dir . '/' . $fileName
+                'url' => $dir . '/' . $fileName
             ]);
         }catch (\Exception $e){
             throw new ErrorException($e->getMessage());

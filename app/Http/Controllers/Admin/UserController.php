@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 use App\Exceptions\ErrorException;
 use App\Http\Controllers\Controller;
 use App\Http\Request\Admin\UserRequest;
+use App\Mail\Test;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
@@ -18,7 +20,7 @@ class UserController extends Controller
         //boos321
         //test
 //        dd(bcrypt('boos321'));
-        $credentials['username']= $request->name;
+        $credentials['username']= $request->username;
         $credentials['password'] = $request->password;
         if (!$token = Auth::guard('user')->attempt($credentials, ['exp' => Carbon::now()->addDays(15)->timestamp])) {
             // errorUnauthorized 返回响应码401 token失效也是401 不利于前端区分 增加额外错误码作为更详细的区分

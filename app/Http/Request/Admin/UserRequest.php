@@ -28,7 +28,7 @@ class UserRequest extends FormRequest
         switch ($uri) {
             case 'admin/login':
                 return [
-                    'name' => 'required',
+                    'username' => 'required',
                     'password' => 'required|string',
                 ];
                 break;
