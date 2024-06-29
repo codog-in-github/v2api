@@ -13,7 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    echo('hello world');
-//    return view('welcome');
+Route::group([
+    'namespace' => 'Admin',
+    'prefix' => 'admin'
+], function () {
+    //后台登录
+    Route::post('login', 'UserController@login');
+
+    Route::group([
+        //需要登录的接口
+        'namespace' => 'Admin',
+        'prefix' => 'admin',
+        'middleware' => [ 'auth_user' ]
+    ], function () {
+
+    });
 });
