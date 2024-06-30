@@ -29,7 +29,7 @@ class UserRequest extends FormRequest
             case 'admin/login':
                 return [
                     'username' => 'required',
-                    'password' => 'required|string',
+                    'password' => 'required',
                 ];
                 break;
         }
@@ -38,8 +38,8 @@ class UserRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => '用户名',
-            'password' => '密码'
+            'name' => 'ユーザー名',
+            'password' => 'パスワード'
         ];
     }
 }

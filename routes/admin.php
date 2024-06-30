@@ -25,5 +25,21 @@ Route::group([
         'middleware' => []
     ], function () {
         Route::post('upload_file', 'FileController@upload');
+
+        Route::get('bank_list', 'BankController@list');
+
+        Route::group(['prefix' => 'country'], function (){
+            Route::get('list', 'CountryController@list');
+            Route::get('tree', 'CountryController@tree');
+        });
+
+        Route::group(['prefix' => 'permission'], function (){
+            Route::get('role_list', 'PermissionController@roleList');
+            Route::post('save_role', 'PermissionController@saveRole');
+            Route::post('del_role', 'PermissionController@delRole');
+            Route::get('permission_list', 'PermissionController@permissionList');
+            Route::post('role_bind_permission', 'PermissionController@roleBindPermission');
+            Route::post('user_permission', 'PermissionController@userPermission');
+        });
     });
 });

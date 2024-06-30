@@ -17,8 +17,6 @@ class CreateRolePermissionsTable extends Migration
             $table->id();
             $table->unsignedInteger('role_id')->default(0)->comment('角色id');
             $table->unsignedInteger('permission_id')->default(0)->comment('权限id');
-            $table->unsignedInteger('operate_id')->default(0)->comment('操作者id');
-            $table->timestamps();
             $table->index(['role_id', 'permission_id']);
         });
         $prefix = DB::getConfig('prefix');

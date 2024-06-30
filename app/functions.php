@@ -435,45 +435,20 @@ if (!function_exists('numToLetter')){
     }
 }
 
-if ( ! function_exists( 'getTree' ) ) {
-    function getTree($data, $pid = 0, $key = 'id', $pKey = 'pid', $childKey = 'children', $maxDepth = 0)
-    {
-        static $depth = 0; //递归深度
-        $depth++;
-        if (intval($maxDepth) <= 0) {
-            $count = count($data);
-            $maxDepth = empty($count * $count) ? 1 : $count * $count; //最大递归深度，防止无限递归
-        }
-        if ($depth > $maxDepth) {
-            exit("error recursion:max recursion depth {$maxDepth}");
-        }
-        $tree = array();
-        foreach ($data as $k => $v) {
-            if ($v[$pKey] == $pid) {
-                $tmp = getTree($data, $v[$key], $key, $pKey, $childKey, $maxDepth);
-                if ($tmp) {
-                    $v[$childKey] = $tmp;
-                }
-                $tree[] = $v;
-            }
-        }
-        return $tree;
-    }
-}
 
-if ( ! function_exists( 'getTree2' ) ) {
+if ( ! function_exists( 'getTree' ) ) {
     /**
      * 生成树解构
      * @param $list
      * @return array
      */
-    function getTree2($list)
+    function getTree($list, $pid = 'pid', $children='children')
     {
         // 生成树结构
         $tree = [];
         foreach ($list as $key => $node) {
-            if ($node['pid']) {
-                $list[$node['pid']]['children'][] = &$list[$key];
+            if ($node[$pid]) {
+                $list[$node[$pid]][$children][] = &$list[$key];
             } else {
                 $tree[] = &$list[$node['id']];
             }
@@ -538,30 +513,6 @@ if (!function_exists('attachmentType')) {
     }
 }
 
-//根据成绩获取排名
-if (!function_exists('getRank')) {
-    //$data 排好顺序的数组
-    //$key 按哪个值排序
-    //$rankKey 排好的名次赋值的keys
-    function getRank($data, $key = 'score', $rankKey = 'rank') {
-        $num = 1;
-        $rank = 1;
-        foreach ($data as $k => &$v) {
-            if ($k == 0) {
-                $v[$rankKey] = $rank;
-            } else {
-                //查看成绩是否相同
-                if ($data[$k][$key] != $data[$k-1][$key]) {
-                    $rank = $num;
-                }
-                $v[$rankKey] = $rank;
-            }
-            $num = $num + 1;
-        }
-
-        return $data;
-    }
-}
 
 if ( ! function_exists( 'curlPost' ) ) {
     function curlPost($url,$header,$data,$is_json) {
