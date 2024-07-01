@@ -15,6 +15,7 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('old_id')->default('')->comment('老系统订单id');
             $table->date('bkg_date')->comment('下单日期');
             $table->string('bkg_no', 100)->unique()->comment('订单号');
             $table->string('bl_no')->default('')->comment('bl_no');
@@ -29,6 +30,7 @@ class CreateOrdersTable extends Migration
             $table->string('address')->default('')->comment('地址');
             $table->string('header')->default('')->comment('负责人');
             $table->string('mobile')->default('')->comment('联系方式');
+            $table->string('legal_number')->default('')->comment('法人番号');
             //船社信息
             $table->string('carrier')->default('')->comment('载体');
             $table->string('c_staff')->default('')->comment('c_staff');
@@ -57,10 +59,13 @@ class CreateOrdersTable extends Migration
             $table->string('discharge_port')->default('')->comment('卸货港口');
 
             $table->string('remark')->default('')->comment('备注');
+            $table->string('creator')->default('')->comment('创建人');
 
             $table->timestamps();
 
             $table->index('bkg_no');
+
+            $table->softDeletes();
         });
         $prefix = DB::getConfig('prefix');
         DB::statement("ALTER TABLE `{$prefix}orders` comment '订单表'");

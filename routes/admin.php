@@ -41,5 +41,11 @@ Route::group([
             Route::post('role_bind_permission', 'PermissionController@roleBindPermission');
             Route::post('user_permission', 'PermissionController@userPermission');
         });
+
+        Route::group(['prefix' => 'customer'], function (){
+            Route::get('list', 'CustomerController@list');
+            Route::post('save', 'CustomerController@save');
+            Route::post('delete', 'CustomerController@delete');
+        });
     });
 });

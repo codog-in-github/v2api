@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrderFilesTable extends Migration
+class CreateContainersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,17 @@ class CreateOrderFilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('order_files', function (Blueprint $table) {
+        Schema::create('containers', function (Blueprint $table) {
             $table->id();
             $table->integer('order_id')->comment('订单id');
-            $table->string('file_path')->comment('文件路径');
-            $table->tinyInteger('type')->comment('文件类型1通关 2业务 3请求 4入库 ');
+            $table->string('common')->default('')->comment('common');
+            $table->string('container_type')->comment('集装箱类型');
             $table->timestamps();
 
             $table->index('order_id');
         });
         $prefix = DB::getConfig('prefix');
-        DB::statement("ALTER TABLE `{$prefix}order_files` comment '订单附件表'");
+        DB::statement("ALTER TABLE `{$prefix}containers` comment '集装箱表'");
     }
 
     /**
@@ -33,6 +33,6 @@ class CreateOrderFilesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('order_files');
+        Schema::dropIfExists('containers');
     }
 }
