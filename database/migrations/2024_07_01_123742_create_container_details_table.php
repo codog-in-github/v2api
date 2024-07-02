@@ -29,7 +29,7 @@ class CreateContainerDetailsTable extends Migration
             $table->string('container')->default('')->comment('集装箱');
             $table->string('sear')->default('')->comment('封装');
             $table->string('tare')->default('')->comment('重量');
-            $table->tinyInteger('tare+type')->default(1)->comment('重量类型1 吨 2 kg');
+            $table->tinyInteger('tare_type')->default(1)->comment('重量类型1 吨 2 kg');
             $table->timestamps();
 
             $table->index('order_id');

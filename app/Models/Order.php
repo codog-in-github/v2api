@@ -20,4 +20,35 @@ class Order extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function containers()
+    {
+        return $this->hasMany(Container::class, 'order_id', 'id');
+    }
+    public function containerDetails()
+    {
+        return $this->hasMany(ContainerDetail::class, 'order_id', 'id');
+    }
+
+    public function nodes()
+    {
+        return $this->hasMany(OrderNode::class, 'order_id', 'id')->orderBy('sort');
+    }
+
+    public function files()
+    {
+        return $this->hasMany(OrderFile::class, 'order_id', 'id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(OrderMessage::class, 'order_id', 'id')->latest();
+    }
+
+    public static function getMonthNo()
+    {
+        $month = date('m');
+        $num = Order::query()->where('month', $month)->count();
+        return compact('month', 'num');
+    }
 }

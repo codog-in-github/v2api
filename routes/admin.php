@@ -32,7 +32,7 @@ Route::group([
             Route::get('list', 'CountryController@list');
             Route::get('tree', 'CountryController@tree');
         });
-
+        //菜单权限
         Route::group(['prefix' => 'permission'], function (){
             Route::get('role_list', 'PermissionController@roleList');
             Route::post('save_role', 'PermissionController@saveRole');
@@ -41,11 +41,19 @@ Route::group([
             Route::post('role_bind_permission', 'PermissionController@roleBindPermission');
             Route::post('user_permission', 'PermissionController@userPermission');
         });
-
+        //顾客
         Route::group(['prefix' => 'customer'], function (){
             Route::get('list', 'CustomerController@list');
             Route::post('save', 'CustomerController@save');
             Route::post('delete', 'CustomerController@delete');
+        });
+        //订单
+        Route::group(['prefix' => 'order'], function (){
+            Route::post('create', 'OrderController@createOrder');
+            Route::get('detail', 'OrderController@detail');
+            Route::post('edit_order', 'OrderController@editOrder');
+            Route::post('delete', 'OrderController@delete');
+
         });
     });
 });
