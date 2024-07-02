@@ -23,6 +23,7 @@ class CreateOrdersTable extends Migration
             $table->string('month')->default('')->comment('下单月');
             $table->integer('month_no')->default(0)->comment('本月第几个订单');
             $table->string('tag')->default('')->comment('标签');
+            $table->string('clearance')->default('')->comment('通关');
 
             $table->integer('node_id')->default(0)->comment('当前节点id');
             $table->string('node_name')->default('')->comment('当前节点中文');
