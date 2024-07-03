@@ -28,9 +28,15 @@ Route::group([
 
         Route::get('bank_list', 'BankController@list');
 
-        Route::group(['prefix' => 'country'], function (){
+        Route::group(['prefix' => 'user'], function (){
             Route::get('list', 'CountryController@list');
             Route::get('tree', 'CountryController@tree');
+        });
+
+        //管理员
+        Route::group(['prefix' => 'user'], function (){
+            Route::get('destroy', 'CountryController@destroy');
+            Route::get('user_list', 'CountryController@userList');
         });
         //菜单权限
         Route::group(['prefix' => 'permission'], function (){
@@ -53,7 +59,9 @@ Route::group([
             Route::get('detail', 'OrderController@detail');
             Route::post('edit_order', 'OrderController@editOrder');
             Route::post('delete', 'OrderController@delete');
-
+            Route::post('save_file', 'OrderController@saveFile');
+            Route::post('del_file', 'OrderController@delFile');
+            Route::post('send_message', 'OrderController@sendMessage');
         });
     });
 });

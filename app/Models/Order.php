@@ -14,7 +14,7 @@ class Order extends Model
         'address', 'header', 'mobile', 'legal_number', 'carrier', 'c_staff', 'service', 'vessel_name', 'voyage', 'loading_country_id',
         'loading_country_name', 'loading_port_id', 'loading_port_name', 'etd', 'cy_open', 'cy_cut', 'doc_cut', 'delivery_country_id',
         'delivery_country_name', 'delivery_port_id', 'delivery_port_name', 'eta', 'free_time_dem', 'free_time_det', 'discharge_country',
-        'discharge_port', 'remark', 'creator',
+        'discharge_port', 'remark', 'creator', 'custom_com_id'
     ];
     protected function serializeDate(\DateTimeInterface $date)
     {

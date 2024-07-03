@@ -21,7 +21,7 @@ class CreateOrderMessagesTable extends Migration
             $table->integer('sender')->comment('发送人姓名');
             $table->integer('receive_id')->comment('接收人id');
             $table->string('receiver')->comment('接收人姓名');
-            $table->tinyInteger('is_handle')->default(0)->comment('是否已处理0否 1是');
+            $table->tinyInteger('is_read')->default(0)->comment('是否已读0否 1是');
             $table->timestamps();
 
             $table->index('order_id');

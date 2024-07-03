@@ -31,5 +31,30 @@ class OrderController extends Controller
         return $this->success(OrderLogic::delete($request));
     }
 
+    public function saveFile(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::saveFile($request));
+    }
+
+    public function delFile(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::delFile($request));
+    }
+
+    public function sendMessage(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::sendMessage($request));
+    }
+
+    public function messageList(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::messageList($request));
+    }
+
+    public function readMessage(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::readMessage($request));
+    }
+
 
 }
