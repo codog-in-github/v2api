@@ -32,7 +32,49 @@ class OrderRequest extends FormRequest
                     'bkg_type' => 'nullable|between:1,8',
                     'node_ids' => 'required_if:bkg_type,8',
                 ];
-
+            case 'admin/order/detail':
+                return [
+                    'id' => 'required'
+                ];
+            case 'admin/order/edit_order':
+                return [
+                    'id' => 'required',
+                    'bkg_type' => 'nullable|between:1,8',
+                    'node_ids' => 'required_if:bkg_type,8',
+                    'containers' => 'nullable|array',
+                    'containers.*.id' => 'nullable|integer',
+                    'containers.*.common' => 'integer',
+                    'containers.*.container_type' => 'integer',
+                    'containers.*.details' => 'array',
+                    'containers.*.details.*.van_place' => 'required',
+                    'containers.*.details.*.van_type' => 'required',
+                    'containers.*.details.*.bearing_type' => 'required',
+                    'containers.*.details.*.deliver_day' => 'required',
+                    'containers.*.details.*.deliver_time' => 'required',
+                    'containers.*.details.*.trans_com' => 'required',
+                    'containers.*.details.*.driver' => 'required',
+                    'containers.*.details.*.tel' => 'required',
+                    'containers.*.details.*.car' => 'required',
+                    'containers.*.details.*.container' => 'required',
+                    'containers.*.details.*.sear' => 'required',
+                    'containers.*.details.*.tare' => 'required',
+                ];
+            case 'admin/order/save_file':
+                return [
+                    'order_id'  => 'required',
+                    'file_path' => 'required',
+                    'type'      => 'required|in:1,2,3,4'
+                ];
+            case 'admin/order/del_file':
+                return [
+                    'id'  => 'required',
+                ];
+            case 'admin/order/send_message':
+                return [
+                    'order_id'      => 'required',
+                    'receive_id'    => 'required',
+                    'content'       => 'required',
+                ];
             default:
                 return [];
         }

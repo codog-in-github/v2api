@@ -51,7 +51,7 @@ class UserController extends Controller
         return [
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_in' => Auth::guard('user')->factory()->getTTL() * 60
+            'expires_in' => Auth::guard('user')->factory()->getTTL() * 60 * 15
         ];
     }
 

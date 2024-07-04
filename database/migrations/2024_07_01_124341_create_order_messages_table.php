@@ -18,7 +18,7 @@ class CreateOrderMessagesTable extends Migration
             $table->integer('order_id')->comment('订单id');
             $table->string('content')->comment('内容');
             $table->integer('send_id')->comment('发送人id');
-            $table->integer('sender')->comment('发送人姓名');
+            $table->string('sender')->comment('发送人姓名');
             $table->integer('receive_id')->comment('接收人id');
             $table->string('receiver')->comment('接收人姓名');
             $table->tinyInteger('is_read')->default(0)->comment('是否已读0否 1是');

@@ -45,10 +45,15 @@ class Order extends Model
         return $this->hasMany(OrderMessage::class, 'order_id', 'id')->latest();
     }
 
-    public static function getMonthNo()
+    public static function createBkgNo()
     {
         $month = date('m');
-        $num = Order::query()->where('month', $month)->count();
-        return compact('month', 'num');
+        $mothNo = self::query()->where('month', '07')->latest()->value('month_no') ?? 99;
+        $preg = "/[349]|(?:001)/";
+        do{
+            $mothNo++;
+        } while(preg_match($preg, $mothNo));
+        $orderNo = date('Ym') . $mothNo . config('order')['tag'];
+        return compact('orderNo', 'month', 'mothNo');
     }
 }

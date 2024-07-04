@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    /**
+     * 新建订单
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function createOrder(OrderRequest $request)
     {
         return $this->success(OrderLogic::createOrder($request));
@@ -31,29 +36,65 @@ class OrderController extends Controller
         return $this->success(OrderLogic::delete($request));
     }
 
+    /**
+     * 保存文件
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function saveFile(OrderRequest $request)
     {
         return $this->success(OrderLogic::saveFile($request));
     }
 
+    /**
+     * 删除文件
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delFile(OrderRequest $request)
     {
         return $this->success(OrderLogic::delFile($request));
     }
 
+    /**
+     * 订单留言
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws ErrorException
+     */
     public function sendMessage(OrderRequest $request)
     {
         return $this->success(OrderLogic::sendMessage($request));
     }
 
+    /**
+     * 订单留言列表
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function messageList(OrderRequest $request)
     {
         return $this->success(OrderLogic::messageList($request));
     }
 
+    /**
+     * 留言已读
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function readMessage(OrderRequest $request)
     {
         return $this->success(OrderLogic::readMessage($request));
+    }
+
+    /**
+     * 报关公司列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCustomCom(Request $request)
+    {
+        return $this->success(OrderLogic::getCustomCom($request));
     }
 
 

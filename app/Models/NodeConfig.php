@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class NodeConfig extends Model
 {
+    protected $table = 'node_config';
     protected $guarded=[];
 }

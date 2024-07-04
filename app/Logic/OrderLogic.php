@@ -5,6 +5,7 @@ use App\Exceptions\ErrorException;
 use App\Models\Bank;
 use App\Models\Container;
 use App\Models\ContainerDetail;
+use App\Models\CustomCompany;
 use App\Models\Customer;
 use App\Models\NodeConfig;
 use App\Models\Order;
@@ -12,23 +13,35 @@ use App\Models\OrderFile;
 use App\Models\OrderMessage;
 use App\Models\OrderNode;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderLogic extends Logic
 {
-    public static function createOrder($request)
+    public static function createOrder(Request $request)
     {
         $customer = Customer::query()->find($request['customer_id']);
-        $order = (new Order())->fill($customer->toArray());
-        $num = Order::getMonthNo();
-        $order->month = $num['month'];
-        $order->month_no = $num['num'] + 1;
+        $order = (new Order())->fill($customer->toArray())->fill($request->only('bkg_type', 'remark'));
+
+        $res = Order::createBkgNo();
+        $order->bkg_no = $order->bl_no = $res['orderNo'];
+        $order->bkg_date = date('Y-m-d');
+        $order->month = $res['month'];
+        $order->month_no = $res['mothNo'];
         $order->creator = auth('user')->user()->username;
-        $order->save();
-        if ($request['bkg_type']) {
-            self::createNode($order);
+        DB::beginTransaction();
+        try {
+            $order->save();
+            if ($request['bkg_type']) {
+                self::createNode($order, $request['node_ids']);
+            }
+            DB::commit();
+            return $order;
+        }catch(\Exception $e){
+            DB::rollBack();
+            throw new  ErrorException($e->getMessage());
         }
-        return $order;
+
     }
 
     public static function detail($id)
@@ -46,7 +59,7 @@ class OrderLogic extends Logic
         try {
             $order->fill($request->all())->save();
             if ($order->isDirty('bkg_type')) {
-                self::createNode($order);
+                self::createNode($order, $request['node_ids'] ?? []);
             }
             //集装箱
             if ($request['containers']) {
@@ -105,17 +118,18 @@ class OrderLogic extends Logic
         return Order::query()->where('id', $request['id'])->delete();
     }
 
-    public static function createNode($order)
+    public static function createNode($order, $node_ids = [])
     {
         if ($order->nodes->isEmpty()) {
             if ($order['bkg_type'] == 8) {
-                $nodes = NodeConfig::query()->where('status', 1)->whereIn('node_ids', $order['node_ids'])->orderBy('sort')->get();
+                $nodes = NodeConfig::query()->where('status', 1)->whereIn('id', $node_ids)->orderBy('sort')->get()->toArray();
             } else {
-                $nodes = NodeConfig::query()->where('status', 1)->whereIn('node_ids', config('node_config')[$order['bkg_type']])->orderBy('sort')->get();
+                $nodes = NodeConfig::query()->where('status', 1)->whereIn('id', config('node_config')[$order['bkg_type']])->orderBy('sort')->get()->toArray();
             }
+
             $first = array_shift($nodes);
             $order->node_id = $first['id'];
-            $order->node_name = $first['name'];
+            $order->node_name = $first['node_name'];
             $order->save();
             $insert = [];
             foreach ($nodes as $k => $v) {
@@ -183,6 +197,17 @@ class OrderLogic extends Logic
     public static function readMessage($request)
     {
         return OrderMessage::query()->where('id', $request['id'])->update(['is_read' => 1]);
+    }
+
+
+    /**
+     * 报关公司列表
+     * @param $request
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function getCustomCom($request)
+    {
+        return CustomCompany::query()->get();
     }
 
 }

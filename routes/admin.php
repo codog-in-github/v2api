@@ -62,6 +62,9 @@ Route::group([
             Route::post('save_file', 'OrderController@saveFile');
             Route::post('del_file', 'OrderController@delFile');
             Route::post('send_message', 'OrderController@sendMessage');
+            Route::get('message_list', 'OrderController@messageList');
+            Route::post('read_message', 'OrderController@readMessage');
+            Route::get('get_custom_com', 'OrderController@getCustomCom');
         });
     });
 });
