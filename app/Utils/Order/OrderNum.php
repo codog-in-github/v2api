@@ -7,7 +7,7 @@ namespace App\Utils\Order;
  * @usage
  *     $orderNum = new OrderNum(1234);
  *     $orderNum->isAvailable(); // 检查1234是否可用
- *     $orderNum->getNext(); // 获取下一个可用订单号
+ *     $orderNum->next(); // 获取下一个可用订单号
  *     $orderNum->toInt() // 将订单号转换为整数
  */
 class OrderNum {
@@ -93,7 +93,7 @@ class OrderNum {
             }
             $currentValue = $last % 10 + $this->numArr[$i];
             $last = (int) ($last / 10);
-            if($currentValue > 10) {
+            if($currentValue > 9) {
                 $currentValue -= 10;
                 $last += 1;
             }
