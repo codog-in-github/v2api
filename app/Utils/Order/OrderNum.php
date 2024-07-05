@@ -7,7 +7,7 @@ namespace App\Utils\Order;
  * @usage
  *     $orderNum = new OrderNum(1234);
  *     $orderNum->isAvailable(); // 检查1234是否可用
- *     $orderNum->getNext(); // 获取下一个可用订单号
+ *     $orderNum->next(); // 获取下一个可用订单号
  *     $orderNum->toInt() // 将订单号转换为整数
  */
 class OrderNum {
