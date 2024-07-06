@@ -40,7 +40,7 @@ class OrderNum {
      * @return bool
      */
     public function isAvailable(): bool{
-        return $this->disabledIndexOf() >= 0;
+        return $this->disabledIndexOf() === -1;
     }
 
     /**
