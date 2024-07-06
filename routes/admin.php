@@ -55,16 +55,20 @@ Route::group([
         });
         //订单
         Route::group(['prefix' => 'order'], function (){
+            Route::get('list', 'OrderController@orderList');
             Route::post('create', 'OrderController@createOrder');
             Route::get('detail', 'OrderController@detail');
             Route::post('edit_order', 'OrderController@editOrder');
             Route::post('delete', 'OrderController@delete');
-            Route::post('save_file', 'OrderController@saveFile');
-            Route::post('del_file', 'OrderController@delFile');
-            Route::post('send_message', 'OrderController@sendMessage');
-            Route::get('message_list', 'OrderController@messageList');
-            Route::post('read_message', 'OrderController@readMessage');
-            Route::get('get_custom_com', 'OrderController@getCustomCom');
+            Route::post('save_file', 'OrderController@saveFile'); //保存附件
+            Route::post('del_file', 'OrderController@delFile'); //删除附件
+            Route::post('send_message', 'OrderController@sendMessage'); //留言
+            Route::get('message_list', 'OrderController@messageList'); //留言列表
+            Route::post('read_message', 'OrderController@readMessage'); //留言已读
+            Route::get('get_custom_com', 'OrderController@getCustomCom'); //报关公司列表
+            Route::get('container_list', 'OrderController@containerList'); //集装箱列表
+            Route::get('list_by_calendar', 'OrderController@getListByCalendar'); //订单按日历列表
+            Route::get('list_by_ship', 'OrderController@getListByShip'); //订单按日历列表
         });
     });
 });

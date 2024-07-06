@@ -2,29 +2,42 @@
 
 namespace App\Logic;
 use App\Exceptions\ErrorException;
+use App\Http\Resources\OrderResource;
 use App\Models\Bank;
 use App\Models\Container;
 use App\Models\ContainerDetail;
 use App\Models\CustomCompany;
 use App\Models\Customer;
+use App\Models\Filter\OrderFilter;
 use App\Models\NodeConfig;
 use App\Models\Order;
 use App\Models\OrderFile;
 use App\Models\OrderMessage;
 use App\Models\OrderNode;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderLogic extends Logic
 {
+    public static function orderList(Request $request)
+    {
+        $query = Order::query()->filter(new OrderFilter($request))->latest()->orderBy('is_top', 'desc');
+        $list = $query->paginate($request['page_size'] ?? 20);
+        foreach ($list as $value){
+            $value->color = Order::getWarningColor($value['cy_cut']); //预警颜色
+        }
+        return $list;
+    }
+
     public static function createOrder(Request $request)
     {
         $customer = Customer::query()->find($request['customer_id']);
         $order = (new Order())->fill($customer->toArray())->fill($request->only('bkg_type', 'remark'));
 
         $res = Order::createBkgNo();
-        $order->bkg_no = $order->bl_no = $res['orderNo'];
+        $order->order_no =  $res['orderNo'];
         $order->bkg_date = date('Y-m-d');
         $order->month = $res['month'];
         $order->month_no = $res['mothNo'];
@@ -52,14 +65,18 @@ class OrderLogic extends Logic
     public static function editOrder($request)
     {
         $order = Order::query()->findOrFail($request['id']);
-        if ($order['bkg_type'] && $request['bkg_type'] && $request['bkg_type'] != $order['bkg_type']) {
-            throw new ErrorException('bkg_type変更不可');
-        }
+//        if ($order['bkg_type'] && $request['bkg_type'] && $request['bkg_type'] != $order['bkg_type']) {
+//            throw new ErrorException('bkg_type変更不可');
+//        }
         DB::beginTransaction();
         try {
-            $order->fill($request->all())->save();
-            if ($order->isDirty('bkg_type')) {
+//            if ($order->isDirty('bkg_type')) {
+            if (!$order['bkg_type'] &&  $request['bkg_type']) {
                 self::createNode($order, $request['node_ids'] ?? []);
+            }
+            $order->fill($request->all())->save();
+            if ($order->status == config('order')['order_status_un']){
+                $order->status == config('order')['order_status_ing'];
             }
             //集装箱
             if ($request['containers']) {
@@ -90,7 +107,6 @@ class OrderLogic extends Logic
                             'van_place' => $detail['van_place'],
                             'van_type' => $detail['van_type'],
                             'bearing_type' => $detail['bearing_type'],
-                            'deliver_day' => $detail['deliver_day'],
                             'deliver_time' => $detail['deliver_time'],
                             'trans_com' => $detail['trans_com'],
                             'driver' => $detail['driver'],
@@ -210,4 +226,59 @@ class OrderLogic extends Logic
         return CustomCompany::query()->get();
     }
 
+    /**
+     * 订单列表 按日历
+     * @param $request
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function getListByCalendar($request)
+    {
+        Carbon::setWeekStartsAt(Carbon::MONDAY);
+        Carbon::setWeekEndsAt(Carbon::FRIDAY);
+        switch ($request['type']){
+            case 1 :
+                $start = Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->subWeek()->endOfWeek()->format('Y-m-d H:i:s');
+                break;
+            case 3 :
+                $start = Carbon::now()->addWeek(1)->startOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->addWeek(1)->endOfWeek()->format('Y-m-d H:i:s');
+                break;
+            default :
+                $start = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
+                break;
+        }
+        $query = Order::query()
+            ->withCount('containers')
+            ->whereBetween('cy_cut', [$start, $end])
+            ->select(['id', 'cy_cut', 'bkg_type', 'company_name', 'short_name', 'loading_country_name',
+                'loading_port_name', 'delivery_country_name', 'delivery_port_name']);
+        if ($request['bkg_type']){
+            $query->where('bkg_type', $request['bkg_type']);
+        }
+        return $query->get()->groupBy('cy_cut');
+    }
+
+    /**
+     * 订单列表按船社分组
+     * @param Request $request
+     * @return array
+     */
+    public static function getListByShip(Request $request)
+    {
+        $request->offsetSet('status', 1);
+        $query = Order::query()->filter(new OrderFilter($request))->latest();
+        $group = $query->get()->groupBy('carrier');
+        $data = [];
+        foreach ($group as $item){
+            $arr = [];
+            foreach ($item as $value){
+                $key = $value['carrier'] . $value['vessel_name'] . $value['voyage'];
+                $arr[$key] = $value;
+            }
+            $data[] = array_values($arr);
+        }
+        return $data;
+    }
 }

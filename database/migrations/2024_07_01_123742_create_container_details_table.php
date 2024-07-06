@@ -20,8 +20,7 @@ class CreateContainerDetailsTable extends Migration
             $table->string('van_place')->default('')->comment('van_place');
             $table->tinyInteger('van_type')->default(1)->comment('van类型');
             $table->tinyInteger('bearing_type')->comment(1)->comment('轴承类型1 二轴 2三轴');
-            $table->date('deliver_day')->nullable()->comment('交付日期');
-            $table->string('deliver_time')->default('')->comment('交付时间 小时');
+            $table->dateTime('deliver_time')->nullable()->comment('交付日期');
             $table->string('trans_com')->default('')->comment('运输公司');
             $table->string('driver')->default('')->comment('司机');
             $table->string('tel')->default('')->comment('联络方式');

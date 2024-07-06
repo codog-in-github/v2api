@@ -5,12 +5,57 @@ use App\Exceptions\ErrorException;
 use App\Http\Controllers\Controller;
 use App\Http\Request\Admin\OrderRequest;
 use App\Logic\BankLogic;
+use App\Logic\ContainerDetailLogic;
 use App\Logic\OrderLogic;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    /**
+     * 订单列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function orderList(Request $request)
+    {
+        $res = OrderLogic::orderList($request);
+        return $this->pageReturn($res->items(), $res->total());
+    }
+
+    /**
+     * 集装箱列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function containerList(Request $request)
+    {
+        $res = ContainerDetailLogic::list($request);
+        return $this->success($res->items(), $res->total());
+    }
+
+    /**
+     * 订单列表 按日历分组
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getListByCalendar(Request $request)
+    {
+        $res = OrderLogic::getListByCalendar($request);
+        return $this->success($res);
+    }
+
+    /**
+     * 订单列表 按船社分组
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getListByShip(Request $request)
+    {
+        $res = OrderLogic::getListByShip($request);
+        return $this->success($res);
+    }
+
     /**
      * 新建订单
      * @param OrderRequest $request
