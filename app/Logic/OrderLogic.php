@@ -26,7 +26,10 @@ class OrderLogic extends Logic
         $query = Order::query()->filter(new OrderFilter($request))->latest()->orderBy('is_top', 'desc');
         $list = $query->paginate($request['page_size'] ?? 20);
         foreach ($list as $value){
-            $value->color = Order::getWarningColor($value['cy_cut']); //预警颜色
+            //todo 不同的状态节点 根据不同的规则返回预警颜色
+            if ($request['node_status']){
+                $value = Order::getWarningColor($value); //预警颜色
+            }
         }
         return $list;
     }
@@ -59,7 +62,7 @@ class OrderLogic extends Logic
 
     public static function detail($id)
     {
-        return Order::query()->with(['containers', 'nodes', 'files', 'messages'])->find($id);
+        return Order::query()->with(['containers', 'nodes', 'files', 'messages', 'requestBooks'])->find($id);
     }
 
     public static function editOrder($request)

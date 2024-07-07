@@ -22,6 +22,7 @@ class CreateCustomersTable extends Migration
             $table->string('header')->default('')->comment('负责人');
             $table->string('mobile')->default('')->comment('联系方式');
             $table->string('legal_number')->default('')->comment('法人番号');
+            $table->string('fax')->default('')->comment('传真');
             $table->timestamps();
 
             $table->softDeletes();

@@ -2,6 +2,7 @@
 
 return [
     'tag' => 'K',
+    //装柜预警时间
     'loading_warning_days' => [
         'red' => 2,
         'yellow' => 3

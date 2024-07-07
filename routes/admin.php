@@ -70,5 +70,11 @@ Route::group([
             Route::get('list_by_calendar', 'OrderController@getListByCalendar'); //订单按日历列表
             Route::get('list_by_ship', 'OrderController@getListByShip'); //订单按日历列表
         });
+
+        //请求书
+        Route::group(['prefix' => 'request_book'], function (){
+            Route::get('detail', 'RequestBookController@detail');
+            Route::post('save', 'RequestBookController@save');
+        });
     });
 });

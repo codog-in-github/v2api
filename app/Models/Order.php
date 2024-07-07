@@ -55,6 +55,10 @@ class Order extends Model
         return $this->hasMany(OrderMessage::class, 'order_id', 'id')->latest();
     }
 
+    public function requestBooks()
+    {
+        return $this->hasMany(RequestBook::class, 'order_id', 'id')->latest();
+    }
     public static function createBkgNo()
     {
         $month = date('m');
@@ -68,16 +72,9 @@ class Order extends Model
     }
 
     //获取预警颜色
-    static public function getWarningColor($time)
+    static public function getWarningColor($order)
     {
-        $diff = Carbon::now()->diffInDays($time);
-        if ($diff <= config('order')['loading_warning_days']['red']){
-            return 1;
-        }
-        if ($diff <= config('order')['loading_warning_days']['yellow']){
-            return 2;
-        }
-        return 3;
+        return $order;
     }
 
     /**
