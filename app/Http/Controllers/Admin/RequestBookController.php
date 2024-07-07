@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Logic\RequestBookLogic;
+use App\Utils\PdfUtils;
 use Illuminate\Http\Request;
 
 class RequestBookController extends Controller
