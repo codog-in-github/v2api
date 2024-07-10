@@ -103,7 +103,7 @@ class Excel
         $styles = [];
         foreach ($spreadsheet->getColumnDimensions() as $column) {
             $styles[] = [
-                'width' => $column->getWidth(\PhpOffice\PhpSpreadsheet\Helper\Dimension::UOM_PIXELS)
+                'width' => $column->getWidth() * 3.75
             ];
         }
         return $styles;
