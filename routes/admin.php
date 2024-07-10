@@ -75,6 +75,8 @@ Route::group([
         Route::group(['prefix' => 'request_book'], function (){
             Route::get('detail', 'RequestBookController@detail');
             Route::post('save', 'RequestBookController@save');
+            Route::post('delete', 'RequestBookController@delete');
+            Route::post('export', 'RequestBookController@exportRequestBook');
         });
     });
 });

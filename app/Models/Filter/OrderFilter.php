@@ -1,6 +1,7 @@
 <?php
 namespace App\Models\Filter;
 use App\Models\Order;
+use Carbon\Carbon;
 
 class OrderFilter extends BaseFilter
 {
@@ -72,6 +73,28 @@ class OrderFilter extends BaseFilter
      */
     public function node_status($nodeStatus)
     {
+        //todo 规则不一样 需要写在sql里
+        //5通关资料 6ACL 7许可 8B/C 10SUR 11请求书
+        switch ($nodeStatus){
+            case 5:
+            case 7:
+                $column = 'cy_cut';
+                $redDay = 1;
+                $yellowDay = 2;
+            case 6:
+                $column = 'doc_cut';
+                $redDay = 1;
+                $yellowDay = 2;
+            case 8:
+                $column = 'cy_cut';
+                $redDay = 0;
+                $yellowDay = 1;
+            case 10:
+                $column = 'cy_cut';
+                $redDay = 0;
+                $yellowDay = 1;
+        }
+
         $status = Order::getStatus($nodeStatus);
         $this->builder->whereHas('nodes', function ($query)use($status){
             if (is_array($status)){

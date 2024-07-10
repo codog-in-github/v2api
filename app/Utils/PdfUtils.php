@@ -6,10 +6,9 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfUtils
 {
-    public function generatePdf()
+    public function generatePdf($filePath, $book)
     {
-        $pdf = Pdf::loadView('pdfs/test', ['order' => '订单数据']);
-        $filePath = 'pdfs/test.pdf';
+        $pdf = Pdf::loadView('pdfs/test', ['data' => $book]);
         Storage::disk('public')->put($filePath, $pdf->output());
         return $filePath;
     }

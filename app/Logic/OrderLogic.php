@@ -26,10 +26,8 @@ class OrderLogic extends Logic
         $query = Order::query()->filter(new OrderFilter($request))->latest()->orderBy('is_top', 'desc');
         $list = $query->paginate($request['page_size'] ?? 20);
         foreach ($list as $value){
-            //todo 不同的状态节点 根据不同的规则返回预警颜色
-            if ($request['node_status']){
-                $value = Order::getWarningColor($value); //预警颜色
-            }
+
+
         }
         return $list;
     }

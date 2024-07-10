@@ -71,12 +71,6 @@ class Order extends Model
         return compact('orderNo', 'month', 'mothNo');
     }
 
-    //获取预警颜色
-    static public function getWarningColor($order)
-    {
-        return $order;
-    }
-
     /**
      * 返回对应状态的节点id
      * @param $status

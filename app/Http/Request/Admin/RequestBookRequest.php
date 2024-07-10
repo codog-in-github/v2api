@@ -28,21 +28,27 @@ class RequestBookRequest extends FormRequest
         switch ($uri) {
             case 'admin/request_book/save':
                 return [
-                    'type' => 'required',
-                    'no' => 'required',
-                    'date' => 'required|date',
-                    'zip_code' => 'required',
-                    'company_name' => 'required',
-                    'company_address' => 'required',
-                    'total_amount' => 'required|numeric',
-                    'tax' => 'required|numeric',
-                    'request_amount' => 'required|numeric',
-                    'bank' => 'required',
-                    'address' => 'required',
-                    'is_stamp' => 'required|in:0,1',
-                    'details' => 'required|array',
-                    'extras' => 'required|array',
-                    'counts' => 'required|array',
+                    'order_id'          => 'required',
+                    'type'              => 'required',
+                    'no'                => 'required',
+                    'date'              => 'required|date',
+                    'zip_code'          => 'required',
+                    'company_name'      => 'required',
+                    'company_address'   => 'required',
+                    'total_amount'      => 'required|numeric',
+                    'tax'               => 'required|numeric',
+                    'request_amount'    => 'required|numeric',
+                    'bank'              => 'required',
+                    'address'           => 'required',
+                    'is_stamp'          => 'required|in:0,1',
+                    'details'           => 'required|array',
+                    'extras'            => 'required|array',
+                    'counts'            => 'required|array',
+                ];
+            case 'admin/request_book/delete':
+            case 'admin/request_book/export':
+                return [
+                    'id' => 'required',
                 ];
             default:
                 return [];
