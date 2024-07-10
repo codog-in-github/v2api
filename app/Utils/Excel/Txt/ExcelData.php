@@ -17,9 +17,13 @@ class ExcelData
         $this->sheets = $sheets;
     }
 
-    public function setActiveSheet(string|int $sheet): void
+    /**
+     * @param string|int $sheet
+     * @return void
+     */
+    public function setActiveSheet($sheet): void
     {
-        echo "设置当前工作表" . $sheet . PHP_EOL;
+//        echo "设置当前工作表" . $sheet . PHP_EOL;
         if(is_int($sheet)) {
             $this->activeSheet = $sheet;
         } else {
@@ -32,12 +36,17 @@ class ExcelData
         return array_search($sheetName, $this->sheets);
     }
 
-    public function getValue(string|array $position, string|int $sheet = null): string
+    /**
+     * @param string|array $position
+     * @param string|int|null $sheet
+     * @return string
+     */
+    public function getValue($position, $sheet = null): string
     {
-        if(gettype($position) === 'string') {
+        if(is_string($position)) {
             $position = Excel::getPosition($position);
         }
-        if(gettype($sheet) === 'string') {
+        if(is_string($sheet)) {
             $sheet = $this->getSheetIndex($sheet);
         } elseif ($sheet === null) {
             $sheet = $this->activeSheet;
@@ -45,7 +54,7 @@ class ExcelData
         return $this->getValueByIndex($sheet, $position[1], $position[0]) ?? '';
     }
 
-    public function getValueByIndex(int $sheet, int $row, int $col): string | null
+    public function getValueByIndex(int $sheet, int $row, int $col): ?string
     {
         return $this->data[$sheet][$row][$col];
     }

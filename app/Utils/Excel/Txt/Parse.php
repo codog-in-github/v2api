@@ -37,16 +37,14 @@ class Parse
 
     public function splitFirstLine(): array
     {
-        $out = [];
         $pos = strpos($this->template, "\n");
-        if($pos === false) {
-            $out[] = $this->template;
-            $out[] = '';
-        } else {
-            $out[] = substr($this->template, 0, $pos);
-            $out[] = substr($this->template, $pos + 1);
+        if ($pos === false) {
+            return [$this->template, ''];
         }
-        return $out;
+        return [
+            substr($this->template, 0, $pos),
+            substr($this->template, $pos + 1)
+        ];
     }
 
     /**
@@ -58,16 +56,16 @@ class Parse
         $last = $body;
         while ($last) {
             $pos = strpos($last, '{');
-            if($pos === false) {
+            if ($pos === false) {
                 $nodes[] = new TextNode($last, $this->data);
-                return $nodes;
+                break;
             }
             $endPos = strpos($last, '}');
-            if($endPos === false) {
+            if ($endPos === false) {
                 throw new Exception('Unclosed bracket');
             }
             $text = substr($last, 0, $pos);
-            if($text) {
+            if ($text) {
                 $nodes[] = new TextNode($text, $this->data);
             }
             $nodes[] = new DataNode(substr($last, $pos + 1, $endPos - $pos - 1), $this->data);
@@ -76,15 +74,12 @@ class Parse
         return $nodes;
     }
 
-
-
     public function output(): string
     {
         $out = '';
-        for($i = 0; $i < count($this->nodes); $i++) {
-            $out .= $this->nodes[$i]->stringify();
+        foreach ($this->nodes as $node) {
+            $out .= $node->stringify();
         }
         return $out;
     }
-
 }
