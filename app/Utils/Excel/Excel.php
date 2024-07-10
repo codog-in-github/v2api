@@ -105,7 +105,7 @@ class Excel
         $styles = [];
         foreach ($spreadsheet->getColumnDimensions() as $column) {
             $styles[] = [
-                'width' => $column->getWidth(),
+                'width' => $column->getWidth() * 3.75,
             ];
         }
         return $styles;
