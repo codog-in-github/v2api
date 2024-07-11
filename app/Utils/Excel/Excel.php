@@ -105,10 +105,15 @@ class Excel
         $styles = [];
         foreach ($spreadsheet->getColumnDimensions() as $column) {
             $styles[] = [
-                'width' => $column->getWidth() * 3.75,
+                'width' => $this->baseWidthToPixels($column->getWidth()),
             ];
         }
         return $styles;
+    }
+
+    protected function baseWidthToPixels(float $excelWidth): float
+    {
+        return $excelWidth * 7 + 5;
     }
 
     protected function getSheetCellStyles(Worksheet $spreadsheet): array
