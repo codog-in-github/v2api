@@ -256,15 +256,15 @@ class OrderLogic extends Logic
         switch ($request['type']){
             case 1 :
                 $start = Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->subWeek()->endOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->subWeek()->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
                 break;
             case 3 :
                 $start = Carbon::now()->addWeek(1)->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->addWeek(1)->endOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->addWeek(1)->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
                 break;
             default :
                 $start = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
                 break;
         }
         $query = Order::query()
