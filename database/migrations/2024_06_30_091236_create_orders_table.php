@@ -73,6 +73,8 @@ class CreateOrdersTable extends Migration
             $table->tinyInteger('status')->default(0)->comment('订单大状态0未开始 1进行中 2已完成 3订单终止');
             $table->date('finish_at')->nullable()->comment('完成或者终止时间');
 
+            $table->tinyInteger('apply_num')->default(0)->comment('给会计的申请数量');
+
             $table->timestamps();
 
             $table->index('bkg_no');

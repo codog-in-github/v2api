@@ -67,43 +67,25 @@ class OrderFilter extends BaseFilter
     }
 
     /**
-     * 节点状态
+     * 节点id
      * @param $nodeStatus
      * @return mixed
      */
     public function node_status($nodeStatus)
     {
-        //todo 规则不一样 需要写在sql里
-        //5通关资料 6ACL 7许可 8B/C 10SUR 11请求书
-        switch ($nodeStatus){
-            case 5:
-            case 7:
-                $column = 'cy_cut';
-                $redDay = 1;
-                $yellowDay = 2;
-            case 6:
-                $column = 'doc_cut';
-                $redDay = 1;
-                $yellowDay = 2;
-            case 8:
-                $column = 'cy_cut';
-                $redDay = 0;
-                $yellowDay = 1;
-            case 10:
-                $column = 'cy_cut';
-                $redDay = 0;
-                $yellowDay = 1;
-        }
-
-        $status = Order::getStatus($nodeStatus);
-        $this->builder->whereHas('nodes', function ($query)use($status){
-            if (is_array($status)){
-                $query->whereIn('node_id', $status);
+        $nodeId = Order::getNodeId($nodeStatus);
+        $this->builder->whereHas('nodes', function ($query)use($nodeId){
+            if (is_array($nodeId)){
+                $query->whereIn('node_id', $nodeId);
             }else{
-                $query->where('node_id', $status);
+                $query->where('node_id', $nodeId);
             }
-            $query->where('mail_status', '!=', 1);
+            $query->where('is_enable', 1)->where('mail_status', '!=', 1);
         });
+        //
+        if (in_array($nodeStatus, [8,9])){
+            $this->builder->orderBy('cy_cut', 'desc');
+        }
         return $this->builder;
     }
 }
