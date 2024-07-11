@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Utils\HolidayJp;
+use Cassandra\Map;
+
 /**
  * 日本的法定假日和每年放假天数如下：
  *
@@ -31,23 +33,79 @@ namespace App\Utils\HolidayJp;
  */
 class Calendar
 {
-    public static self $instance;
+
+    /**
+     * @var array<string, self>
+     */
+    private static array $calendarCaches = [];
 
     /**
      * @var string[]
      */
-    public static $staticHolidays = [
-        '01-01', '01-02', '02-11', '02-23', '03-20', '04-29', '05-03', '05-04', '05-05', '07-23', '08-11', '09-23', '10-23', '11-23'
+    public static array $staticHolidays = [
+        '01-01', '02-11', '04-29', '05-03', '05-04', '05-05', '08-11', '11-03', '11-23'
     ];
 
-    public static $dynamicHolidays = [];
+    /**
+     * @var string[]
+     */
+    public static array $dynamicHolidays = [
+        Holidays\Adult::class,
+        Holidays\SpringEquinox::class,
+        Holidays\AutumnEquinox::class,
+        Holidays\EmperorBirthday::class,
+        Holidays\Aged::class,
+        Holidays\Sport::class,
+        Holidays\Sea::class,
+    ];
+
+    public array $holidays = [];
 
     public function __construct($year)
     {
-
+        $dHoliday = [];
+        foreach (self::$dynamicHolidays as $dynamicHoliday) {
+            $dHoliday = array_merge($dHoliday, (new $dynamicHoliday($year))->getDay());
+        }
+        $dHoliday = array_merge(self::$staticHolidays, $dHoliday);
+        $mapCallee = function ($date) use ($year) {
+            return "$year-$date";
+        };
+        $dHoliday = array_map($mapCallee, $dHoliday);
+        sort($dHoliday, SORT_STRING);
+        $this->holidays = $dHoliday;
     }
-    public static function getHolidays($startDate, $endDate): array
+    public static function getHolidays(string $startDate, string $endDate): array
     {
-        return [];
+
+        $startYear = substr($startDate, 0, 4);
+        $endYear = substr($endDate, 0, 4);
+        if($startYear != $endYear) {
+            return array_merge(
+                self::getHolidays($startDate, date("Y-m-d", strtotime($endYear-01-01)) - 24 * 3600),
+                self::getHolidays("$endYear-01-01", $endDate)
+            );
+        }
+        if(!isset(self::$calendarCaches[$startYear])) {
+            self::$calendarCaches[$startYear] = new self($startYear);
+        }
+        $dates = [];
+        $currentCalendar = self::$calendarCaches[$startYear];
+        $i = 0;
+        while (
+            $i < count($currentCalendar->holidays)
+            && $currentCalendar->holidays[$i] <= $startDate
+        ) {
+            $i++;
+        }
+        for(;$i < count($currentCalendar->holidays) && $currentCalendar->holidays[$i] <= $endDate; $i ++) {
+            $dates[] = $currentCalendar->holidays[$i];
+        }
+        return $dates;
+    }
+
+    public static function getWeek($date): int
+    {
+        return (strtotime($date) / 3600 / 24 - 4) % 7;
     }
 }
