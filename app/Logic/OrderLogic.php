@@ -299,4 +299,12 @@ class OrderLogic extends Logic
         }
         return $data;
     }
+
+    public static function updateShipSchedule($request)
+    {
+        return Order::query()->whereIn('id', $request['ids'])->update([
+            'etd' => Carbon::parse($request['etd'])->format('Y-m-d H:i:s'),
+            'eta' => Carbon::parse($request['eta'])->format('Y-m-d H:i:s'),
+        ]);
+    }
 }
