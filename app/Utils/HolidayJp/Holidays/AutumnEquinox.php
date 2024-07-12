@@ -4,25 +4,26 @@ namespace App\Utils\HolidayJp\Holidays;
 
 use App\Utils\HolidayJp\Calendar;
 use App\Utils\HolidayJp\DynamicHoliday;
+use App\Utils\HolidayJp\Year;
 
 /**
  * 秋分日
  */
 class AutumnEquinox implements DynamicHoliday
 {
-    protected string $year;
-    public function __construct(string $year)
+    protected Year $year;
+    public function __construct(Year $year)
     {
         $this->year = $year;
     }
 
     public function getDay(): array
     {
-
-        $springEquinox = new \DateTime("{$this->year}-09-22", new \DateTimeZone('UTC'));
-        if ($springEquinox->format('Y') !== $this->year) {
-            return ["09-23"];
-        }
-        return ["09-22"];
+        $Y = $this->year->getYear() - 2000;
+        $D = 0.2422;
+        $C = 23.042;
+        $L = (int) ($Y / 4);
+        $day = (int) ($Y * $D + $C - $L);
+        return ["09-$day"];
     }
 }

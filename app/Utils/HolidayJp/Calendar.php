@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Utils\HolidayJp;
-use Cassandra\Map;
 
 /**
  * 日本的法定假日和每年放假天数如下：
@@ -63,6 +62,7 @@ class Calendar
 
     public function __construct($year)
     {
+        $year = new Year($year);
         $dHoliday = [];
         foreach (self::$dynamicHolidays as $dynamicHoliday) {
             $dHoliday = array_merge($dHoliday, (new $dynamicHoliday($year))->getDay());
@@ -82,7 +82,10 @@ class Calendar
         $endYear = substr($endDate, 0, 4);
         if($startYear != $endYear) {
             return array_merge(
-                self::getHolidays($startDate, date("Y-m-d", strtotime($endYear-01-01)) - 24 * 3600),
+                self::getHolidays(
+                    $startDate,
+                    date("Y-m-d", strtotime("$endYear-01-01") - 24 * 3600)
+                ),
                 self::getHolidays("$endYear-01-01", $endDate)
             );
         }
@@ -94,7 +97,7 @@ class Calendar
         $i = 0;
         while (
             $i < count($currentCalendar->holidays)
-            && $currentCalendar->holidays[$i] <= $startDate
+            && $currentCalendar->holidays[$i] < $startDate
         ) {
             $i++;
         }

@@ -4,14 +4,15 @@ namespace App\Utils\HolidayJp\Holidays;
 
 use App\Utils\HolidayJp\Calendar;
 use App\Utils\HolidayJp\DynamicHoliday;
+use App\Utils\HolidayJp\Year;
 
 
 // 成人の日（1月的第二个星期一） - 庆祝达到成年（20岁）的年轻人。
 class Adult implements DynamicHoliday
 {
-    protected string $year;
+    protected Year $year;
 
-    public function __construct(string $year)
+    public function __construct(Year $year)
     {
         $this->year = $year;
     }
