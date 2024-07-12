@@ -17,4 +17,8 @@ class CodeEnum
         self::LOGIN_UNVALID => "登录验证失败",
         self::LOGIN_TOKEN_UNVALID => 'token失效'
     ];
+
+    const COLOR_RED = 3;
+    const COLOR_YELLOW = 2;
+    const COLOR_GREEN = 1;
 }

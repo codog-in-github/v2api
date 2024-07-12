@@ -69,12 +69,15 @@ Route::group([
             Route::get('container_list', 'OrderController@containerList'); //集装箱列表
             Route::get('list_by_calendar', 'OrderController@getListByCalendar'); //订单按日历列表
             Route::get('list_by_ship', 'OrderController@getListByShip'); //订单按日历列表
+            Route::post('update_ship_schedule', 'OrderController@updateShipSchedule'); //船期更新
         });
 
         //请求书
         Route::group(['prefix' => 'request_book'], function (){
             Route::get('detail', 'RequestBookController@detail');
             Route::post('save', 'RequestBookController@save');
+            Route::post('delete', 'RequestBookController@delete');
+            Route::post('export', 'RequestBookController@exportRequestBook');
         });
     });
 });

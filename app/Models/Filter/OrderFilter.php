@@ -1,6 +1,7 @@
 <?php
 namespace App\Models\Filter;
 use App\Models\Order;
+use Carbon\Carbon;
 
 class OrderFilter extends BaseFilter
 {
@@ -66,21 +67,25 @@ class OrderFilter extends BaseFilter
     }
 
     /**
-     * 节点状态
+     * 节点id
      * @param $nodeStatus
      * @return mixed
      */
     public function node_status($nodeStatus)
     {
-        $status = Order::getStatus($nodeStatus);
-        $this->builder->whereHas('nodes', function ($query)use($status){
-            if (is_array($status)){
-                $query->whereIn('node_id', $status);
+        $nodeId = Order::getNodeId($nodeStatus);
+        $this->builder->whereHas('nodes', function ($query)use($nodeId){
+            if (is_array($nodeId)){
+                $query->whereIn('node_id', $nodeId);
             }else{
-                $query->where('node_id', $status);
+                $query->where('node_id', $nodeId);
             }
-            $query->where('mail_status', '!=', 1);
+            $query->where('is_enable', 1)->where('mail_status', '!=', 1);
         });
+        //
+        if (in_array($nodeStatus, [8,9])){
+            $this->builder->orderBy('cy_cut', 'desc');
+        }
         return $this->builder;
     }
 }

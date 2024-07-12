@@ -22,7 +22,7 @@ class ContainerDetailLogic extends Logic
             $item->loading_port_name = $item->order->loading_port_name; //装柜港口
             $item->delivery_country_name = $item->order->delivery_country_name; //到达国家
             $item->delivery_port_name = $item->order->delivery_port_name; //到达港口
-            $item->color = Order::getWarningColor($item['deliver_time']); //预警颜色
+            $item->color = ContainerDetail::getWarningColor($item['deliver_time']); //预警颜色
             unset($item['order']);
         }
         return $list;

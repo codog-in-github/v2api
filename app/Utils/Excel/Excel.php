@@ -4,23 +4,26 @@ namespace App\Utils\Excel;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Reader\IReader;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class Excel
 {
-
     protected Spreadsheet $spreadsheet;
     protected string $excelPath;
+
     public function __construct(string $file)
     {
         $this->excelPath = storage_path('excel/' . $file);
-        $this->spreadsheet = IOFactory::createReaderForFile($this->excelPath)->load($this->excelPath);
+        try {
+            $this->spreadsheet = IOFactory::createReaderForFile($this->excelPath)->load($this->excelPath);
+        } catch (\Exception $e) {
+            throw new \RuntimeException("Failed to load Excel file: " . $e->getMessage());
+        }
     }
 
-    public function getAllSheetStyles()
+    public function getAllSheetStyles(): array
     {
         $data = [];
         $names = $this->spreadsheet->getSheetNames();
@@ -30,7 +33,7 @@ class Excel
         return $data;
     }
 
-    public function getAllData()
+    public function getAllData(): array
     {
         $data = [];
         $names = $this->spreadsheet->getSheetNames();
@@ -40,32 +43,32 @@ class Excel
         return $data;
     }
 
-    public function getData(Worksheet $sheet)
+    public function getData(Worksheet $sheet): array
     {
         return $sheet->toArray();
     }
 
-    public function getSheetStyles (Worksheet $sheet): array
+    public function getSheetStyles(Worksheet $sheet): array
     {
         return [
             'column' => $this->getSheetColumnStyles($sheet),
             'cell' => $this->getSheetCellStyles($sheet),
-            'merge' => $this->getMergeCells($sheet)
+            'merge' => $this->getMergeCells($sheet),
         ];
     }
 
-    protected function getMergeCells (Worksheet $spreadsheet): array
+    protected function getMergeCells(Worksheet $spreadsheet): array
     {
         $cells = [];
         foreach ($spreadsheet->getMergeCells() as $mergeCell) {
-            [$fromStr , $toStr] = explode(':', $mergeCell);
+            [$fromStr, $toStr] = explode(':', $mergeCell);
             $from = self::getPosition($fromStr);
             $to = self::getPosition($toStr);
             $merge = [
                 'col' => $from[0],
                 'row' => $from[1],
                 'colspan' => $to[0] - $from[0] + 1,
-                'rowspan' => $to[1] - $from[1] + 1
+                'rowspan' => $to[1] - $from[1] + 1,
             ];
             $cells[] = $merge;
         }
@@ -77,39 +80,43 @@ class Excel
         $columnName = strtoupper($columnName);
         $index = 0;
         $maxLen = strlen($columnName);
-        for($i = 0; $i < $maxLen; $i++) {
-            $cur = ord($columnName[$i]) - ord('A');
-            $index += $cur * pow(26, $maxLen - $i - 1);
+        for ($i = 0; $i < $maxLen; $i++) {
+            $cur = ord($columnName[$i]) - ord('A') + 1;
+            $index = $index * 26 + $cur;
         }
-        return $index;
+        return $index - 1;
     }
+
     public static function getPosition(string $positionName): array
     {
-        echo $positionName . PHP_EOL;
-        if(!preg_match('/^[a-zA-Z]+[0-9]+$/', $positionName)){
+        if (!preg_match('/^[a-zA-Z]+[0-9]+$/', $positionName)) {
             return [0, 0];
         }
         $col = preg_replace('/\d+$/', '', $positionName);
         $row = substr($positionName, strlen($col));
         return [
             self::getColumnIndex($col),
-            ((int) $row) - 1
+            ((int) $row) - 1,
         ];
     }
 
-
-    protected function getSheetColumnStyles (Worksheet $spreadsheet): array
+    protected function getSheetColumnStyles(Worksheet $spreadsheet): array
     {
         $styles = [];
         foreach ($spreadsheet->getColumnDimensions() as $column) {
             $styles[] = [
-                'width' => $column->getWidth(\PhpOffice\PhpSpreadsheet\Helper\Dimension::UOM_PIXELS)
+                'width' => $this->baseWidthToPixels($column->getWidth()),
             ];
         }
         return $styles;
     }
 
-    protected function getSheetCellStyles (Worksheet $spreadsheet): array
+    protected function baseWidthToPixels(float $excelWidth): float
+    {
+        return $excelWidth * 7 + 5;
+    }
+
+    protected function getSheetCellStyles(Worksheet $spreadsheet): array
     {
         $styles = [];
         foreach ($spreadsheet->getRowIterator() as $row) {
@@ -118,7 +125,7 @@ class Excel
         return $styles;
     }
 
-    protected function getRowStyles (Row $row): array
+    protected function getRowStyles(Row $row): array
     {
         $styles = [];
         foreach ($row->getCellIterator() as $cell) {
@@ -127,17 +134,17 @@ class Excel
         return $styles;
     }
 
-    protected function getCellStyles (Cell $cell): array | null
+    protected function getCellStyles(Cell $cell): ?array
     {
         $style = [];
         $color = $cell->getStyle()->getFill()->getStartColor()->getRGB();
         $align = $cell->getStyle()->getAlignment()->getHorizontal();
-        if($color !== 'FFFFFF') {
+        if ($color !== 'FFFFFF') {
             $style['color'] = $color;
         }
-        if($align !== 'general') {
+        if ($align !== 'general') {
             $style['align'] = $align;
         }
-        return $style ? $style : null;
+        return $style ?: null;
     }
 }

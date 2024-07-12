@@ -75,6 +75,12 @@ class OrderRequest extends FormRequest
                     'receive_id'    => 'required',
                     'content'       => 'required',
                 ];
+            case 'admin/order/update_ship_schedule':
+                return [
+                    'ids'       => 'required|array',
+                    'eta'       => 'required|date',
+                    'etd'       => 'required|date',
+                ];
             default:
                 return [];
         }

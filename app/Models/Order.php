@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\CodeEnum;
 use App\Models\Filter\BaseFilter;
 use App\Models\Filter\OrderFilter;
 use Carbon\Carbon;
@@ -71,20 +72,67 @@ class Order extends Model
         return compact('orderNo', 'month', 'mothNo');
     }
 
-    //获取预警颜色
-    static public function getWarningColor($order)
+    //获取预警颜色 3 红色 2黄色 1绿色
+    public static function getColor($nodeStatus, $order)
     {
-        return $order;
+        //3DRIVE 4通关资料 5ACL 6许可 7 B/C 8SUR 9请求书
+        switch ($nodeStatus){
+            case 3:
+            case 4:
+            case 6:
+                $start = Carbon::now();
+                $end = Carbon::parse($order->cy_cut);
+                if ($start >= $end) return CodeEnum::COLOR_RED;
+                $diffDays = self::compareTwoTime($start, $end);
+                return $diffDays < 1 ? CodeEnum::COLOR_RED : ($diffDays <= 2 ? CodeEnum::COLOR_YELLOW : CodeEnum::COLOR_GREEN);
+            case 5:
+                $start = Carbon::now();
+                $end = Carbon::parse($order->doc_cut);
+                if ($start >= $end) return CodeEnum::COLOR_RED;
+                $diffDays = self::compareTwoTime($start, $end);
+                return $diffDays < 1 ? CodeEnum::COLOR_RED : ($diffDays <= 2 ? CodeEnum::COLOR_YELLOW : CodeEnum::COLOR_GREEN);
+            case 7:
+                $start = Carbon::parse($order->cy_cut);
+                $end = Carbon::now();
+                $diffDays = self::compareTwoTime($start, $end);
+                return $diffDays > 1 ? CodeEnum::COLOR_RED : ($diffDays >= 0 ? CodeEnum::COLOR_YELLOW : CodeEnum::COLOR_GREEN) ;
+            default:
+                return 1;
+        }
+    }
+
+    /**
+     * 开始时间与结束时间对比 跳过周末节假期
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return int
+     */
+    public static function compareTwoTime(Carbon $start, Carbon $end) :int
+    {
+        $iniDate = clone ($start);
+        $holidays = ['2024-07-12'];
+        $restDay = 0;
+        while($start->lte($end)){
+            if (in_array($start->dayOfWeek, [6, 0])){
+                //周末+1天
+                $restDay++;
+            }
+            if (in_array($start->format('Y-m-d'), $holidays)){
+                $restDay++;
+            }
+            $start->addDay();
+        }
+        return $iniDate->addDays($restDay)->diffInDays($end);
     }
 
     /**
      * 返回对应状态的节点id
-     * @param $status
-     * @return int|int[]|void
+     * @param $nodeStatus
+     * @return int|int[]
      */
-    public static function getStatus($status)
+    public static function getNodeId($nodeStatus)
     {
-        switch ($status) {
+        switch ($nodeStatus) {
             case 1:
                 return [1, 2];
             case 2:

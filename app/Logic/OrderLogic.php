@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Logic;
+use App\Enum\CodeEnum;
 use App\Exceptions\ErrorException;
 use App\Http\Resources\OrderResource;
 use App\Models\Bank;
@@ -23,13 +24,30 @@ class OrderLogic extends Logic
 {
     public static function orderList(Request $request)
     {
-        $query = Order::query()->filter(new OrderFilter($request))->latest()->orderBy('is_top', 'desc');
-        $list = $query->paginate($request['page_size'] ?? 20);
-        foreach ($list as $value){
-            //todo 不同的状态节点 根据不同的规则返回预警颜色
-            if ($request['node_status']){
-                $value = Order::getWarningColor($value); //预警颜色
+        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')->latest()->get();
+        if ($request['node_status'] && in_array($request['node_status'], [4,5,6,7])){
+            foreach ($list as $value){
+                $value['top'] = Order::getColor($request['node_status'], $value);
             }
+            //排序
+            $tops = array_column($list, 'top');
+            array_multisort($tops, SORT_DESC, $list);
+        }
+        if ($request['node_status'] && $request['node_status'] == 8) {
+            foreach ($list as $value){
+                $value['top'] = $value->apply_num > 0 ? CodeEnum::COLOR_RED : CodeEnum::COLOR_GREEN;
+            }
+            //排序
+            $tops = array_column($list, 'top');
+            array_multisort($tops, SORT_DESC, $list);
+        }
+        if ($request['node_status'] && $request['node_status'] == 9) {
+            foreach ($list as $value){
+                $value['top'] = $value->requestBooks->where('is_confirm', 0)->count() > 0 ? CodeEnum::COLOR_RED : CodeEnum::COLOR_GREEN ;
+            }
+            //排序
+            $tops = array_column($list, 'top');
+            array_multisort($tops, SORT_DESC, $list);
         }
         return $list;
     }
@@ -140,23 +158,22 @@ class OrderLogic extends Logic
     public static function createNode($order, $node_ids = [])
     {
         if ($order->nodes->isEmpty()) {
-            if ($order['bkg_type'] == 8) {
-                $nodes = NodeConfig::query()->where('status', 1)->whereIn('id', $node_ids)->orderBy('sort')->get()->toArray();
-            } else {
-                $nodes = NodeConfig::query()->where('status', 1)->whereIn('id', config('node_config')[$order['bkg_type']])->orderBy('sort')->get()->toArray();
-            }
+            $allNodes = NodeConfig::query()->where('status', 1)->orderBy('sort')->get();
+//            if ($order['bkg_type'] == 8) {
+//                $nodes = NodeConfig::query()->where('status', 1)->whereIn('id', $node_ids)->orderBy('sort')->get()->toArray();
+//            } else {
+//                $nodes = NodeConfig::query()->where('status', 1)->whereIn('id', config('node_config')[$order['bkg_type']])->orderBy('sort')->get()->toArray();
+//            }
+            $node_ids = $order['bkg_type'] == 8 ? $node_ids : config('node_config')[$order['bkg_type']];
 
-            $first = array_shift($nodes);
-            $order->node_id = $first['id'];
-            $order->node_name = $first['node_name'];
-            $order->save();
             $insert = [];
-            foreach ($nodes as $k => $v) {
+            foreach ($allNodes as $k => $v) {
                 $insert[] = [
                     'node_id' => $v['id'],
-                    'status' => 0,
+                    'status' => 0, //节点状态
                     'order_id' => $order['id'],
-                    'sort' => $k + 1,
+                    'sort' => $v['sort'],
+                    'is_enable' => in_array($v['id'], $node_ids),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ];
@@ -236,20 +253,18 @@ class OrderLogic extends Logic
      */
     public static function getListByCalendar($request)
     {
-        Carbon::setWeekStartsAt(Carbon::MONDAY);
-        Carbon::setWeekEndsAt(Carbon::FRIDAY);
         switch ($request['type']){
             case 1 :
                 $start = Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->subWeek()->endOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->subWeek()->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
                 break;
             case 3 :
                 $start = Carbon::now()->addWeek(1)->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->addWeek(1)->endOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->addWeek(1)->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
                 break;
             default :
                 $start = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
+                $end = Carbon::now()->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
                 break;
         }
         $query = Order::query()
@@ -283,5 +298,13 @@ class OrderLogic extends Logic
             $data[] = array_values($arr);
         }
         return $data;
+    }
+
+    public static function updateShipSchedule($request)
+    {
+        return Order::query()->whereIn('id', $request['ids'])->update([
+            'etd' => Carbon::parse($request['etd'])->format('Y-m-d H:i:s'),
+            'eta' => Carbon::parse($request['eta'])->format('Y-m-d H:i:s'),
+        ]);
     }
 }

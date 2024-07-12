@@ -29,7 +29,8 @@ class CreateRequestBooksTable extends Migration
             $table->string('address')->default('')->comment('地址');
             $table->tinyInteger('is_stamp')->default(1)->comment('是否盖章0否 1是');
             $table->boolean('is_confirm')->default(0)->comment('是否已确认0否 1是');
-            $table->boolean('has_export')->default(0)->comment('是否已导出0否 1是');
+            $table->tinyInteger('export_num')->default(0)->comment('导出次数');
+            $table->string('file_path')->default('')->comment('文件路径');
             $table->timestamps();
 
             $table->softDeletes();
