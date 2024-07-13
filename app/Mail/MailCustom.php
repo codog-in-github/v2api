@@ -16,21 +16,21 @@ class MailCustom extends Mailable
     public $content;
     public $from;
     public $name;
-    public $file;
+    public $files;
 
     /**
-     * @param $subject
-     * @param $content
-     * @param $from
-     * @param $file
+     * @param string $subject
+     * @param string $content
+     * @param string $from
+     * @param array $files
      */
-    public function __construct($subject, $content, $from, $name, $file)
+    public function __construct(string $subject, string $content, string $from, string $name, array $files = [])
     {
         $this->subject = $subject;
         $this->content = $content;
         $this->from = $from;
         $this->name = $name;
-        $this->file = $file;
+        $this->files = $files;
     }
 
     /**
@@ -40,11 +40,12 @@ class MailCustom extends Mailable
      */
     public function build()
     {
-        Mail::to('recipient@example.com')->send(new MailCustom('邮件主题', '邮件内容', '', ''));
+        foreach ($this->files as $file){
+            $this->attach(formatFile($file));
+        }
         return $this->text('emails.custom')
             ->from($this->from, $this->name)
             ->subject($this->subject)
-            ->with(['content' => $this->content])
-            ->attachFromStorageDisk('public', $this->file);
+            ->with(['content' => $this->content]);
     }
 }

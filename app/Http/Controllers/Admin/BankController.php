@@ -13,4 +13,18 @@ class BankController extends Controller
        $res = BankLogic::list($request);
        return $this->success($res);
     }
+
+    public function selectList(Request $request)
+    {
+        return $this->success(BankLogic::selectList($request));
+    }
+
+    public function optionList(Request $request)
+    {
+        return $this->success(BankLogic::optionList($request));
+    }
+    public function departmentList(Request $request)
+    {
+        return $this->success(BankLogic::departmentList($request));
+    }
 }

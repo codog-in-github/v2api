@@ -27,8 +27,11 @@ Route::group([
         Route::post('upload_file', 'FileController@upload');
 
         Route::get('bank_list', 'BankController@list');
+        Route::get('select_list', 'BankController@selectList');
+        Route::get('option_list', 'BankController@optionList');
+        Route::get('department_list', 'BankController@departmentList');
 
-        Route::group(['prefix' => 'user'], function (){
+        Route::group(['prefix' => 'country'], function (){
             Route::get('list', 'CountryController@list');
             Route::get('tree', 'CountryController@tree');
         });
@@ -70,6 +73,7 @@ Route::group([
             Route::get('list_by_calendar', 'OrderController@getListByCalendar'); //订单按日历列表
             Route::get('list_by_ship', 'OrderController@getListByShip'); //订单按日历列表
             Route::post('update_ship_schedule', 'OrderController@updateShipSchedule'); //船期更新
+            Route::post('send_email', 'OrderController@sendEmail'); //批量发送邮件
         });
 
         //请求书
@@ -78,6 +82,7 @@ Route::group([
             Route::post('save', 'RequestBookController@save');
             Route::post('delete', 'RequestBookController@delete');
             Route::post('export', 'RequestBookController@exportRequestBook');
+            Route::post('change_status', 'RequestBookController@changeStatus');
         });
     });
 });

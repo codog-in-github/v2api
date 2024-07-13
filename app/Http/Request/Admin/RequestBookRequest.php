@@ -47,6 +47,7 @@ class RequestBookRequest extends FormRequest
                 ];
             case 'admin/request_book/delete':
             case 'admin/request_book/export':
+            case 'admin/request_book/change_status':
                 return [
                     'id' => 'required',
                 ];

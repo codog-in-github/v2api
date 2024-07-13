@@ -19,18 +19,18 @@ if ( ! function_exists( 'checkMobile' ) ) {
     }
 }
 
-if ( ! function_exists( 'formatImgByString' ) ) {
-    //添加前缀图片
-    function formatImgByString($img)
+if ( ! function_exists( 'formatFile' ) ) {
+    //添加文件前缀
+    function formatFile($file)
     {
         //判断是否已经有域名了，有的话直接返回
-        if (strpos($img, "http") !== false) {
-            return $img;
+        if (strpos($file, "http") !== false) {
+            return $file;
         }
 
         //去掉最前面的 /
-        $img = preg_replace("/^\/*/", "", $img);
-        return $img ? functions . phpconfig('oss.domain') . $img : '';
+        $file = preg_replace("/^\/*/", "", $file);
+        return $file ? env('APP_URL') . '/' . $file : '';
     }
 }
 
@@ -69,21 +69,6 @@ if ( ! function_exists( 'removeImgHostByString' ) ) {
     }
 }
 
-if ( ! function_exists( 'formatImg51' ) ) {
-    //返回51车前缀图片
-    function formatImg51($img)
-    {
-        //判断是否已经有域名了，有的话直接返回
-        if (strpos($img, "http") !== false) {
-            return $img;
-        }
-
-        //去掉最前面的 /
-        $img = preg_replace("/^\/*/", "", $img);
-        $img = $img ? functions . phpconfig('oss.51_domain') . $img : '';
-        return $img;
-    }
-}
 
 if ( ! function_exists( 'formatImgArr' ) ) {
     //数组图片

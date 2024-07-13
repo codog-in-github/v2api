@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enum\CodeEnum;
 use App\Models\Filter\BaseFilter;
 use App\Models\Filter\OrderFilter;
+use App\Utils\HolidayJp\Calendar;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,11 +15,12 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'old_id', 'bkg_date', 'bkg_no', 'bl_no', 'bkg_type', 'month', 'month_no', 'tag', 'company_name', 'short_name', 'zip_code',
-        'address', 'header', 'mobile', 'legal_number', 'carrier', 'c_staff', 'service', 'vessel_name', 'voyage', 'loading_country_id',
-        'loading_country_name', 'loading_port_id', 'loading_port_name', 'etd', 'cy_open', 'cy_cut', 'doc_cut', 'delivery_country_id',
-        'delivery_country_name', 'delivery_port_id', 'delivery_port_name', 'eta', 'free_time_dem', 'free_time_det', 'discharge_country',
-        'discharge_port', 'remark', 'creator', 'custom_com_id', 'order_type', 'order_no', 'customer_id', 'is_top', 'status', 'finish_at'
+        'old_id', 'bkg_date', 'bkg_no', 'bl_no', 'bkg_type', 'month', 'month_no', 'tag', 'company_name', 'short_name',
+        'zip_code', 'address', 'header', 'mobile', 'legal_number', 'carrier', 'c_staff', 'service', 'vessel_name', 'voyage',
+        'loading_country_id', 'loading_country_name', 'loading_port_id', 'loading_port_name', 'etd', 'cy_open', 'cy_cut',
+        'doc_cut', 'delivery_country_id', 'delivery_country_name', 'delivery_port_id', 'delivery_port_name', 'eta',
+        'free_time_dem', 'free_time_det', 'discharge_country', 'discharge_port', 'remark', 'creator', 'custom_com_id',
+        'order_type', 'order_no', 'customer_id', 'is_top', 'status', 'finish_at', 'email'
     ];
 
     public function scopeFilter($query, BaseFilter $filters)
@@ -110,7 +112,7 @@ class Order extends Model
     public static function compareTwoTime(Carbon $start, Carbon $end) :int
     {
         $iniDate = clone ($start);
-        $holidays = ['2024-07-12'];
+        $holidays = Calendar::getHolidays($start->format('Y-m-d H:i:s'), $end->format('Y-m-d H:i:s'));
         $restDay = 0;
         while($start->lte($end)){
             if (in_array($start->dayOfWeek, [6, 0])){

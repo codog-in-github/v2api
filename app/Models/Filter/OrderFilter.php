@@ -80,9 +80,15 @@ class OrderFilter extends BaseFilter
             }else{
                 $query->where('node_id', $nodeId);
             }
-            $query->where('is_enable', 1)->where('mail_status', '!=', 1);
+            $query->where('is_enable', 1);
         });
         //
+        if ($nodeStatus == 1){
+            $this->builder->where(function ($query){
+                $query->where('is_top', 1)
+                    ->orWhere('remark', '!=', '');
+            })->orderBy('is_top', 'desc');
+        }
         if (in_array($nodeStatus, [8,9])){
             $this->builder->orderBy('cy_cut', 'desc');
         }

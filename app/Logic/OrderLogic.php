@@ -4,6 +4,7 @@ namespace App\Logic;
 use App\Enum\CodeEnum;
 use App\Exceptions\ErrorException;
 use App\Http\Resources\OrderResource;
+use App\Mail\MailCustom;
 use App\Models\Bank;
 use App\Models\Container;
 use App\Models\ContainerDetail;
@@ -19,6 +20,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class OrderLogic extends Logic
 {
@@ -300,11 +302,32 @@ class OrderLogic extends Logic
         return $data;
     }
 
+    /**
+     * 船期更新
+     * @param $request
+     * @return int
+     */
     public static function updateShipSchedule($request)
     {
         return Order::query()->whereIn('id', $request['ids'])->update([
             'etd' => Carbon::parse($request['etd'])->format('Y-m-d H:i:s'),
             'eta' => Carbon::parse($request['eta'])->format('Y-m-d H:i:s'),
         ]);
+    }
+
+    /**
+     * 发送邮件
+     * @param $request
+     * @return string
+     */
+    public static function sendEmail($request)
+    {
+        $subject = $request['subject'];
+        $content = $request['content'];//邮件内容
+        $to = is_array($request['to']) ? $request['to'] : explode(',', $request['to']);
+        $from = auth('user')->user()->email ?? env('MAIL_FROM_ADDRESS');
+        $name = auth('user')->user()->name ?? env('MAIL_FROM_NAME');
+        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? ''));
+        return 'success';
     }
 }

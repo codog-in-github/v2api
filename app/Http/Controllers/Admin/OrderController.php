@@ -152,5 +152,14 @@ class OrderController extends Controller
         return $this->success(OrderLogic::updateShipSchedule($request));
     }
 
+    /**
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendEmail(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::sendEmail($request));
+    }
+
 
 }

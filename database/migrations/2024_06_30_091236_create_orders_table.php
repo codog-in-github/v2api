@@ -34,6 +34,7 @@ class CreateOrdersTable extends Migration
             $table->string('company_name')->default('')->comment('名称');
             $table->string('short_name')->default('')->comment('简称');
             $table->string('zip_code')->default('')->comment('邮编');
+            $table->string('email')->default('')->comment('邮编');
             $table->string('address')->default('')->comment('地址');
             $table->string('header')->default('')->comment('负责人');
             $table->string('mobile')->default('')->comment('联系方式');

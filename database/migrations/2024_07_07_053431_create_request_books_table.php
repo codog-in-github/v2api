@@ -31,6 +31,7 @@ class CreateRequestBooksTable extends Migration
             $table->boolean('is_confirm')->default(0)->comment('是否已确认0否 1是');
             $table->tinyInteger('export_num')->default(0)->comment('导出次数');
             $table->string('file_path')->default('')->comment('文件路径');
+            $table->boolean('is_entry')->default(0)->comment('是否已入账0否 1是');
             $table->timestamps();
 
             $table->softDeletes();

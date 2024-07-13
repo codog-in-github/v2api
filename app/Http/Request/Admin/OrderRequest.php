@@ -61,25 +61,31 @@ class OrderRequest extends FormRequest
                 ];
             case 'admin/order/save_file':
                 return [
-                    'order_id'  => 'required',
+                    'order_id' => 'required',
                     'file_path' => 'required',
-                    'type'      => 'required|in:1,2,3,4'
+                    'type' => 'required|in:1,2,3,4'
                 ];
             case 'admin/order/del_file':
                 return [
-                    'id'  => 'required',
+                    'id' => 'required',
                 ];
             case 'admin/order/send_message':
                 return [
-                    'order_id'      => 'required',
-                    'receive_id'    => 'required',
-                    'content'       => 'required',
+                    'order_id' => 'required',
+                    'receive_id' => 'required',
+                    'content' => 'required',
                 ];
             case 'admin/order/update_ship_schedule':
                 return [
-                    'ids'       => 'required|array',
-                    'eta'       => 'required|date',
-                    'etd'       => 'required|date',
+                    'ids' => 'required|array',
+                    'eta' => 'required|date',
+                    'etd' => 'required|date',
+                ];
+            case 'admin/order/send_email':
+                return [
+                    'subject' => 'required|string',
+                    'content' => 'required|string',
+                    'to' => 'required',
                 ];
             default:
                 return [];

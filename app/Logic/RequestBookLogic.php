@@ -7,6 +7,7 @@ use App\Jobs\GeneratePdf;
 use App\Models\RequestBook;
 use App\Models\RequestBookDetail;
 use App\Utils\PdfUtils;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RequestBookLogic extends Logic
@@ -37,7 +38,6 @@ class RequestBookLogic extends Logic
             DB::rollBack();
             throw new ErrorException($e->getMessage());
         }
-
     }
 
     public static function delete($request)
@@ -47,6 +47,17 @@ class RequestBookLogic extends Logic
             throw new ErrorException('エクスポートされたファイルは削除できません');
         }
         return $book->delete();
+    }
+
+    /**
+     * 修改请求书状态
+     * @param Request $request
+     * @return bool
+     */
+    public static function changeStatus(Request $request)
+    {
+        $book = RequestBook::query()->findOrFail($request['id']);
+        return $book->fill($request->only(['is_confirm', 'is_entry']))->save();
     }
 
     /**
@@ -65,9 +76,10 @@ class RequestBookLogic extends Logic
             //没有生成过请求书
             $filePath = self::generatePdf($book);
             $book->file_path = $filePath;
-            $book->save();
         }
-        return ['file_path' => $book->file_path];
+        $book->export_num += 1;
+        $book->save();
+        return ['file_path' => formatFile($book->file_path)];
     }
 
     /**

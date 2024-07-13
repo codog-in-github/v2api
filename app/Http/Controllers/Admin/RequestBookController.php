@@ -40,6 +40,16 @@ class RequestBookController extends Controller
     }
 
     /**
+     * 修改请求书状态 is_confirm is_entry
+     * @param RequestBookRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changeStatus(RequestBookRequest $request)
+    {
+        return $this->success(RequestBookLogic::changeStatus($request));
+    }
+
+    /**
      * 导出请求书
      * @param RequestBookRequest $request
      * @return \Illuminate\Http\JsonResponse
