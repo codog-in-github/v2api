@@ -45,6 +45,6 @@ class CreateContainerDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('container_detail');
+        Schema::dropIfExists('container_details');
     }
 }
