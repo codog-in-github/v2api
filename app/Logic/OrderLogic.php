@@ -57,7 +57,7 @@ class OrderLogic extends Logic
     public static function createOrder(Request $request)
     {
         $customer = Customer::query()->find($request['customer_id']);
-        $order = (new Order())->fill($customer->toArray())->fill($request->only('bkg_type', 'remark'));
+        $order = (new Order())->fill($customer->toArray() ?? [])->fill($request->only('bkg_type', 'remark'));
 
         $res = Order::createBkgNo();
         $order->order_no =  $res['orderNo'];
@@ -172,7 +172,6 @@ class OrderLogic extends Logic
             foreach ($allNodes as $k => $v) {
                 $insert[] = [
                     'node_id' => $v['id'],
-                    'status' => 0, //节点状态
                     'order_id' => $order['id'],
                     'sort' => $v['sort'],
                     'is_enable' => in_array($v['id'], $node_ids),
