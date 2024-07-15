@@ -22,7 +22,7 @@ Route::group([
 
     Route::group([
         //需要登录的接口
-        'middleware' => []
+        'middleware' => ['jwt.auth']
     ], function () {
         Route::post('upload_file', 'FileController@upload');
 
