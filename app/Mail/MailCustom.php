@@ -40,7 +40,8 @@ class MailCustom extends Mailable
      */
     public function build()
     {
-        foreach ($this->files as $file){
+        $files = is_array($this->files) ? $this->files : implode(',', $this->files);
+        foreach ($files as $file){
             $this->attach(formatFile($file));
         }
         return $this->text('emails.custom')

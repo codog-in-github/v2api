@@ -20,7 +20,7 @@ class OrderController extends Controller
     public function orderList(Request $request)
     {
         $res = OrderLogic::orderList($request);
-        return $this->pageReturn($res->items(), $res->total());
+        return $this->success($res);
     }
 
     /**
