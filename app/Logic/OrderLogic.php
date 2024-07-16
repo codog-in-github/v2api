@@ -326,7 +326,7 @@ class OrderLogic extends Logic
         $to = is_array($request['to']) ? $request['to'] : explode(',', $request['to']);
         $from = auth('user')->user()->email ?? env('MAIL_FROM_ADDRESS');
         $name = auth('user')->user()->name ?? env('MAIL_FROM_NAME');
-        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? ''));
+        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
     }
 }

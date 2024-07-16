@@ -83,9 +83,10 @@ class OrderRequest extends FormRequest
                 ];
             case 'admin/order/send_email':
                 return [
-                    'subject' => 'required|string',
-                    'content' => 'required|string',
-                    'to' => 'required',
+                    'order_id'  => 'required',
+                    'subject'   => 'required|string',
+                    'content'   => 'required|string',
+                    'to'        => 'required',
                 ];
             default:
                 return [];
