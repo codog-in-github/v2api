@@ -89,16 +89,18 @@ class RequestBookLogic extends Logic
      */
     public static function generatePdf(RequestBook $book)
     {
-        $fileName = self::getPdfName($book);
-        $filePath = 'pdfs/' . date('Ymd') . '/' . $fileName;
-        GeneratePdf::dispatch($filePath, $book);
+        $res = self::getPdfName($book);
+        $fileName = $res['fileName'];
+        $filePath = $res['filePath'];
+        (new PdfUtils(1))->generatePdf($filePath, $book);
+//        GeneratePdf::dispatch($filePath, $book);//队列
         return $filePath;
     }
 
     /**
-     * 生成pdf文件名
+     * 生成request pdf文件名
      * @param $book
-     * @return string
+     * @return array
      */
     public static function getPdfName($book)
     {
@@ -109,6 +111,11 @@ class RequestBookLogic extends Logic
         $fileName .= $books->where('type', $book->type)->count();
         $fileName .= '-' . $book->order->bkg_no . '-';
         $fileName .= $books->count();
-        return $fileName;
+        $dir = public_path('/pdfs/' . date('Ymd'));
+        if (!is_dir($dir)){
+            mkdir($dir);
+        }
+        $filePath = 'pdfs/' . date('Ymd') . '/' . $fileName;
+        return compact('fileName', 'filePath');
     }
 }

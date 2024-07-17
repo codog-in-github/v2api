@@ -1,0 +1,138 @@
+<html>
+    <head>
+        <style>
+            header{
+                padding-bottom: 10px;
+                border-bottom:1px dashed #000 ;
+            }
+            .logo{
+                width: 40%;
+                float: left;
+            }
+            .address{
+                float: right;
+                width: 55%;
+            }
+            .title h1{
+                width: 70%;
+                font-size: 40px;
+                float: left;
+            }
+            .title .date{
+                float: right;
+                width: 20%;
+                text-align: right;
+            }
+            .main{
+                background: #f3f3f3;
+                padding: 20px 0;
+            }
+            .row{
+                margin:10px 0;
+                padding: 0 10px;
+            }
+            .label{
+                width: 23%;
+                float: left;
+                font-weight: bold;
+            }
+            .cell{
+                width: 75%;
+                float: right;
+            }
+            footer{
+                border: 1px solid #000;
+                padding: 10px;
+                height: 240px;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo fl">
+                <img src="{$img}">
+            </div>
+            <div class="address">{$address}</div>
+        </header>
+        <main>
+            <div class="title">
+                <h1>BOOKING NOTICE</h1>
+                <div class="date">DATE<br/><?php echo date('Y-m-d') ?></div>
+            </div>
+            <div class="form">
+                <div class="header">
+                    <div class="row">
+                        <div class="label">SHIPPER:</div>
+                        <div class="cell">{$shipper}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">BOOKING NO:</div>
+                        <div class="cell">{$booking_no}</div>
+                    </div>
+                </div>
+                <div class="main">
+                    <div class="row">
+                        <div class="label">VESSEL:</div>
+                        <div class="cell">{$vessel}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">VOY:</div>
+                        <div class="cell">{$voy}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">VESSEL CARRIER:</div>
+                        <div class="cell">{$vessel_carrier}</div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="row">
+                        <div class="label">POL:</div>
+                        <div class="cell">{$pol}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">POD:</div>
+                        <div class="cell">{$pod}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">ETD:</div>
+                        <div class="cell">{$etd}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">ETA:</div>
+                        <div class="cell">{$eta}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">CY OPEN:</div>
+                        <div class="cell">{$cy_open}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">CY CUT:</div>
+                        <div class="cell">{$cy_cut}</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">DOC CUT:</div>
+                        <div class="cell">{$doc_cut}</div>
+                    </div>
+                    <volist name="container" id="c">
+                        <div class="row">
+                            <div class="label">CONTAINER:</div>
+                            <div class="cell">{$c}</div>
+                        </div>
+                    </volist>
+                    <div class="row">
+                        <div class="label">COMMODITY:</div>
+                        <div class="cell">{$common}</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <if condition="$consiginee">
+                <h2 >CONSIGINEE</h2>
+                <article>{$consiginee}</article>
+            </if>
+            <h2>REMARKS</h2>
+            <article>{$remarks}</article>
+        </footer>
+    </body>
+</html>

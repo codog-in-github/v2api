@@ -16,6 +16,7 @@ use App\Models\Order;
 use App\Models\OrderFile;
 use App\Models\OrderMessage;
 use App\Models\OrderNode;
+use App\Models\RequestBook;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -80,20 +81,26 @@ class OrderLogic extends Logic
 
     }
 
-    public static function detail($id)
+    public static function detail($keyword)
     {
-        return Order::query()->with(['containers', 'nodes', 'files', 'messages', 'requestBooks'])->find($id);
+        return Order::query()
+            ->with(['containers', 'nodes', 'files', 'messages', 'requestBooks'])
+            ->where(function ($query)use($keyword){
+                $query->orWhere('id', $keyword)
+                    ->orWhere('order_no', $keyword)
+                    ->orWhere('bkg_no', $keyword);
+            })->first();
     }
 
     public static function editOrder($request)
     {
-        $order = Order::query()->findOrFail($request['id']);
+        $order = Order::query()->findOrNew($request['id'] ?? 0);
 //        if ($order['bkg_type'] && $request['bkg_type'] && $request['bkg_type'] != $order['bkg_type']) {
 //            throw new ErrorException('bkg_type変更不可');
 //        }
         DB::beginTransaction();
         try {
-//            if ($order->isDirty('bkg_type')) {
+
             if (!$order['bkg_type'] &&  $request['bkg_type']) {
                 self::createNode($order, $request['node_ids'] ?? []);
             }
@@ -113,35 +120,11 @@ class OrderLogic extends Logic
                 Container::query()->whereIn('id', $delContainerIds)->delete();
                 ContainerDetail::query()->whereIn('id', $delContainerDetailIds)->delete();
 
-                foreach ($request['containers'] as $container) {
-                    $con = Container::query()->updateOrCreate([
-                        'id' => $container['id'] ?? 0
-                    ], [
-                        'order_id' => $order->id,
-                        'common' => $container['common'],
-                        'container_type' => $container['container_type'],
-                    ]);
-                    foreach ($container['details'] as $detail) {
-                        Container::query()->updateOrCreate([
-                            'id' => $detail['id'] ?? 0
-                        ], [
-                            'order_id' => $order->id,
-                            'container_id' => $con->id,
-                            'van_place' => $detail['van_place'],
-                            'van_type' => $detail['van_type'],
-                            'bearing_type' => $detail['bearing_type'],
-                            'deliver_time' => $detail['deliver_time'],
-                            'trans_com' => $detail['trans_com'],
-                            'driver' => $detail['driver'],
-                            'tel' => $detail['tel'],
-                            'car' => $detail['car'],
-                            'container' => $detail['container'],
-                            'sear' => $detail['sear'],
-                            'tare' => $detail['tare'],
-                            'tare_type' => $detail['tare_type'],
-                        ]);
-                    }
-                }
+                self::saveContainers($order, $request['containers']);
+            }
+            //如果有origin_order_id 需要复制请求书
+            if ($request['origin_order_id']){
+                $order = self::copyOrder($order, $request['origin_order_id']);
             }
             DB::commit();
             return $order;
@@ -328,5 +311,96 @@ class OrderLogic extends Logic
         $name = auth('user')->user()->name ?? env('MAIL_FROM_NAME');
         Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
+    }
+
+
+    public static function changeNodeStatus($request)
+    {
+        $orderNode = OrderNode::query()->findOrFail($request['id']);
+        //todo 已经送信了能关闭吗
+        if ($orderNode->node_id == 11){
+            //todo 如果是 请 这个节点 需要向会计发起申请
+
+            return $orderNode;
+        }
+        $orderNode->is_enable = $request['is_enable'];
+        $orderNode->save();
+        return $orderNode;
+    }
+
+    public static function copyOrder($order, $origin_order_id)
+    {
+        $originOrder = Order::query()
+            ->with(['files', 'requestBooks'])
+            ->find($origin_order_id)->toArray();
+        if (!$originOrder){
+            throw new ErrorException('元のオーダーは存在しません');
+        }
+
+//        self::saveContainers($order, $originOrder['containers']);
+
+        $unset = function ($array)
+        {
+            unset($array['id']);
+            unset($array['request_id']);
+            unset($array['created_at']);
+            unset($array['updated_at']);
+            return $array;
+        };
+        foreach ($originOrder['requestBooks'] as $originBook){
+            $book = new RequestBook();
+            $book->fill($originBook);
+            if ($originBook['file_path']){
+                //copyfile
+                $filePath = RequestBookLogic::getPdfName($book)['filePath'];
+                copy(public_path($originBook['file_path']), public_path($filePath));
+                $book['file_path'] = $filePath;
+            }
+            $book->save();
+
+            $details = array_map($unset, $originBook['details']);
+            $counts = array_map($unset, $originBook['counts']);
+            $extras = array_map($unset, $originBook['extras']);
+
+            $book->details()->createMany($details);
+            $book->counts()->createMany($counts);
+            $book->extras()->createMany($extras);
+        }
+        return $order;
+    }
+
+
+    public static function saveContainers($order, $containers)
+    {
+        foreach ($containers as $container) {
+            $con = Container::query()->updateOrCreate([
+                'id' => $container['id'] ?? 0
+            ], [
+                'order_id' => $order->id,
+                'common' => $container['common'],
+                'container_type' => $container['container_type'],
+                'quantity' => $container['quantity'],
+            ]);
+            foreach ($container['details'] as $detail) {
+                Container::query()->updateOrCreate([
+                    'id' => $detail['id'] ?? 0
+                ], [
+                    'order_id' => $order->id,
+                    'container_id' => $con->id,
+                    'van_place' => $detail['van_place'],
+                    'van_type' => $detail['van_type'],
+                    'bearing_type' => $detail['bearing_type'],
+                    'deliver_time' => $detail['deliver_time'],
+                    'trans_com' => $detail['trans_com'],
+                    'driver' => $detail['driver'],
+                    'tel' => $detail['tel'],
+                    'car' => $detail['car'],
+                    'container' => $detail['container'],
+                    'sear' => $detail['sear'],
+                    'tare' => $detail['tare'],
+                    'tare_type' => $detail['tare_type'],
+                ]);
+            }
+        }
     }
 }

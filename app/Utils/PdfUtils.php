@@ -11,10 +11,10 @@ class PdfUtils
     {
         $this->templateType = $templateType;
     }
-    public function generatePdf($filePath, $book)
+    public function generatePdf($filePath, $data)
     {
         $template = $this->getTemplate();
-        $pdf = Pdf::loadView($template, ['data' => $book]);
+        $pdf = Pdf::loadView($template, ['data' => $data]);
         Storage::disk('public')->put($filePath, $pdf->output());
         return $filePath;
     }

@@ -82,12 +82,18 @@ class OrderFilter extends BaseFilter
             }
             $query->where('is_enable', 1);
         });
-        //
+
         if ($nodeStatus == 1){
-            $this->builder->where(function ($query){
-                $query->where('is_top', 1)
-                    ->orWhere('remark', '!=', '');
-            })->orderBy('is_top', 'desc');
+            $this->builder->whereHas('nodes', function ($query){
+                //bk和运 存在开启但没送信的
+                $query->whereIn('node_id', [1,2])
+                ->where('is_enable', 1)
+                ->where('mail_status', 0);
+            })
+                ->orWhere('is_top', 1)  //手动置顶任务
+                ->orWhereNotNull('task_user') //remark任务
+                ->orWhere('apply_num', '>', 0) //存在向会计申请的
+                ->orderBy('is_top', 'desc');
         }
         if (in_array($nodeStatus, [8,9])){
             $this->builder->orderBy('cy_cut', 'desc');

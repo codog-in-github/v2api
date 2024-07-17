@@ -18,6 +18,7 @@ class CreateContainersTable extends Migration
             $table->integer('order_id')->comment('订单id');
             $table->string('common')->default('')->comment('common');
             $table->string('container_type')->comment('集装箱类型');
+            $table->integer('quantity')->default(1)->comment('数量');
             $table->timestamps();
 
             $table->index('order_id');

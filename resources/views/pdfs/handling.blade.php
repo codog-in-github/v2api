@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .body{
+            width: 100%;
+            height: 100%;
+        }
+        td{
+            padding: 8px 1px;
+            text-align: center;
+            font-size: 15px;
+            border: #000 1px solid ;
+        }
+        .wrap{
+            white-space: break-word;
+            vertical-align: top;
+        }
+        table{
+            height: 100%;
+            /* table-layout: fixed; */
+            border-collapse:collapse;
+        }
+        .label,.label-r{
+            padding-right: 3px;
+            background-color: #F2F2F2;
+            white-space: nowrap;
+        }
+        .label-y{
+            background-color: burlywood;
+        }
+        .label-r{
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align:right">DATE:<?php echo date('Y/m/d'); ?></div>
+    <div style="text-align:right">< exprot ></div>
+    <table width="100%" cellspacing="0">
+        <tr>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="70px" style="border: none;height: 0;"></td>
+            <td width="100px" style="border: none;height: 0;"></td>
+            <td width="100px" style="border: none;height: 0;"></td>
+            <td width="100px" style="border: none;height: 0;"></td>
+            <td width="200px" style="border: none;height: 0;"></td>
+            <td width="1px" style="border: none;height: 0;"></td>
+        </tr>
+        <tr>
+            <td colspan="4" class="label-y">法人番号</td>
+            <td colspan="3" class="label-y">輸出者符号</td>
+            <td colspan="3" class="label-y">輸出者(SHIPPER)</td>
+            <!-- 左右分割 -->
+            <td style="width: 3px;" rowspan="12" class="label">内容</td>
+            <td colspan="3" class="label">社内番号:{$in_no}</td>
+            <td colspan="2" class="label">INVOICE NO:{$invoice_no}</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="label-y">{$croporate}</td>
+            <td colspan="3" class="label-y">{$outputer_symbol}</td>
+            <td colspan="3" class="label-y">{$shipper}</td>
+            <td rowspan="11" colspan="5" class="wrap" align="left" style="padding: 1em">{$content}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">DOC CUT</td>
+            <td colspan="4">{$doc_cut}</td>
+            <td class="label-r">本船名</td>
+            <td colspan="4">{$vessel_name}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">CY CUT</td>
+            <td colspan="4">{$cy_cut}</td>
+            <td class="label-r">(VOY.NO)</td>
+            <td colspan="4">{$voyage}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">ETD</td>
+            <td colspan="4">{$etd}</td>
+            <td class="label-r">BOOKING</td>
+            <td colspan="4">{$booking}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">ETA</td>
+            <td colspan="4">{$eta}</td>
+            <td class="label-r">船社</td>
+            <td colspan="4">{$carrier}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">CY OPEN</td>
+            <td colspan="4">{$cy_open}</td>
+            <td class="label-r">通関業者</td>
+            <td colspan="4">{$forwarder}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">コンテナ</td>
+            <td colspan="2">{$container_type}</td>
+            <td colspan="1">{$sum_queantity}</td>
+            <td colspan="1">{$unity}</td>
+            <td class="label-r">ドレー会社</td>
+            <td colspan="4">{$transprotation}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label-r">スケール</td>
+            <td colspan="4">{$expenses}</td>
+            <td class="label-r">3軸指定</td>
+            <td colspan="4">{$chassis}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td rowspan="2" class="label"></td>
+            <td class="label" colspan="2">バーゼル</td>
+            <td class="label">貿管令Ⅰ</td>
+            <td class="label">貿管令Ⅱ</td>
+            <td class="label">植物</td>
+            <td class="label">動物</td>
+            <td class="label">危険品</td>
+            <td class="label" colspan="2">その他</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td colspan="2">{$item_type[0]}</td>
+            <td>{$item_type[1]}</td>
+            <td>{$item_type[2]}</td>
+            <td>{$item_type[3]}</td>
+            <td>{$item_type[4]}</td>
+            <td>{$item_type[5]}</td>
+            <td colspan="2">{$item_type[6]}</td>
+            <!-- 左右分割 -->
+        </tr>
+        <tr>
+            <td class="label" colspan="2" rowspan="2" style="height: 50px;">CONSIGNEE/BL品名</td>
+            <td colspan="8" rowspan="2">{$consignee}</td>
+            <!-- 左右分割 -->
+            <td style="height: 120px;border: none;"></td>
+        </tr>
+        <tr>
+            <!-- 左右分割 -->
+            <td colspan="6" align="center" class="label" >進捗状況</td>
+        </tr>
+        <tr>
+            <td class="label"  colspan="2">HS CODE 指定</td>
+            <td colspan="8">{$hs_code}</td>
+            <!-- 左右分割 -->
+            <td colspan="2" class="label">海上保険</td>
+            <td colspan="2">{$sea_insurance}</td>
+            <td class="label">バーゼル担当</td>
+            <td style="width:6.6%">{$basel_charge}</td>
+        </tr>
+        <tr>
+            <td class="label"  colspan="2">空コンピック日</td>
+            <td colspan="8">{$free_day}</td>
+            <!-- 左右分割 -->
+            <td colspan="2" class="label">ブッキングNo</td>
+            <td colspan="2">{$bkg_no}</td>
+            <td class="label">バーゼル返答日時</td>
+            <td>{$basel_back_time}</td>
+        </tr>
+        <tr>
+           <td class="label" colspan="2">ピックオーダー依頼</td>
+           <td>{$pick_order}</td>
+           <td>{$pick_order_request}</td>
+           <td colspan="2" class="label">ピックオーダー送付</td>
+           <td colspan="2">{$send_pick_order}</td>
+           <td colspan="2">{$send_pick_order1}</td>
+            <!-- 左右分割 -->
+           <td colspan="2" class="label">乙仲通関書類送付</td>
+           <td colspan="2">{$contoms_document}</td>
+           <td class="label">申告日 / 許可日</td>
+           <td>{$request_date} / {$permission_date}</td>
+        </tr>
+        <tr>
+            <td class="label" class="label"  colspan="2">バン詰め日程</td>
+            <td colspan="8">{$van_day}</td>
+            <!-- 左右分割 -->
+            <td colspan="2" class="label">申告番号</td>
+            <td colspan="2">{$request_no}</td>
+            <td class="label">件 欄 (区分)</td>
+            <td>{$type}</td>
+        </tr>
+        <tr>
+            <td class="label"  colspan="2">バン詰め場所</td>
+            <td colspan="8">{$van_place}</td>
+            <!-- 左右分割 -->
+            <td colspan="2" class="label">ACL , D/R 差し入れ</td>
+            <td colspan="2">{$acl_insert}</td>
+            <td class="label">サレンダー手配</td>
+            <td>{$surrender_arrangement}</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="label">PICK場所</td>
+            <td colspan="4">{$pick_place}</td>
+            <td colspan="1" class="label">B/L分割</td>
+            <td colspan="3">{$bl_cut}</td>
+            <!-- 左右分割 -->
+            <td colspan="2" class="label">B/L送付</td>
+            <td colspan="2">{$bl_send}</td>
+            <td class="label">追加費用</td>
+            <td>{$extra_money}</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="label">搬入場所</td>
+            <td colspan="4">{$carry_place}</td>
+            <td colspan="1" class="label">お客様SI確認</td>
+            <td colspan="3">{$si_check}</td>
+            <!-- 左右分割 -->
+            <td colspan="2" class="label">B/L NO.</td>
+            <td colspan="2">{$bl_no}</td>
+            <td class="label">請求書</td>
+            <td>{$request_book}</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="label">お客様書類送付</td>
+            <td colspan="2">{$c_book[0]}</td>
+            <td colspan="2">{$c_book[1]}</td>
+            <td colspan="2">{$c_book[2]}</td>
+            <td colspan="3">{$c_book[3]}</td>
+            <td colspan="2">{$c_book[4]}</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</body>
+</html>
