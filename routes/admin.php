@@ -38,8 +38,8 @@ Route::group([
 
         //管理员
         Route::group(['prefix' => 'user'], function (){
-            Route::get('destroy', 'CountryController@destroy');
-            Route::get('user_list', 'CountryController@userList');
+            Route::get('destroy', 'UserController@destroy');
+            Route::get('user_list', 'UserController@userList');
         });
         //菜单权限
         Route::group(['prefix' => 'permission'], function (){
