@@ -86,9 +86,13 @@ class OrderLogic extends Logic
         return Order::query()
             ->with(['containers', 'nodes', 'files', 'messages', 'requestBooks'])
             ->where(function ($query)use($keyword){
-                $query->orWhere('id', $keyword)
-                    ->orWhere('order_no', $keyword)
-                    ->orWhere('bkg_no', $keyword);
+                if (is_numeric($keyword)) {
+                    $query->where('id', $keyword);
+                } elseif(preg_match("/^(:?[123]-)?\d+K$/", $keyword)) {
+                    $query->where('order_no', $keyword);
+                } else {
+                    $query->where('bkg_no', $keyword);
+                }
             })->first();
     }
 
