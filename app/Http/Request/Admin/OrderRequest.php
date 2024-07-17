@@ -57,7 +57,7 @@ class OrderRequest extends FormRequest
                     'containers.*.details.*.tel' => 'required',
                     'containers.*.details.*.car' => 'required',
                     'containers.*.details.*.container' => 'required',
-                    'containers.*.details.*.sear' => 'required',
+                    'containers.*.details.*.seal' => 'required',
                     'containers.*.details.*.tare' => 'required',
                 ];
             case 'admin/order/save_file':

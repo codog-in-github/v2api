@@ -396,7 +396,7 @@ class OrderLogic extends Logic
                     'tel' => $detail['tel'],
                     'car' => $detail['car'],
                     'container' => $detail['container'],
-                    'sear' => $detail['sear'],
+                    'seal' => $detail['seal'],
                     'tare' => $detail['tare'],
                     'tare_type' => $detail['tare_type'],
                 ]);
