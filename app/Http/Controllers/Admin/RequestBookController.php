@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Request\Admin\RequestBookRequest;
+use App\Logic\OrderLogic;
 use App\Logic\RequestBookLogic;
 use App\Utils\PdfUtils;
 use Illuminate\Http\Request;
@@ -57,6 +58,12 @@ class RequestBookController extends Controller
     public function exportRequestBook(RequestBookRequest $request)
     {
         return $this->success(RequestBookLogic::save($request));
+    }
+
+
+    public function pdfByStream(RequestBookRequest $request)
+    {
+        return $this->success(RequestBookLogic::pdfByStream($request));
     }
 
 

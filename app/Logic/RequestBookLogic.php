@@ -2,6 +2,7 @@
 
 namespace App\Logic;
 
+use App\Enum\PdfEnum;
 use App\Exceptions\ErrorException;
 use App\Jobs\GeneratePdf;
 use App\Models\RequestBook;
@@ -92,7 +93,7 @@ class RequestBookLogic extends Logic
         $res = self::getPdfName($book);
         $fileName = $res['fileName'];
         $filePath = $res['filePath'];
-        (new PdfUtils(1))->generatePdf($filePath, $book);
+        (new PdfUtils())->generatePdf($filePath, $book, PdfEnum::TEMPLATE_VIEW[PdfEnum::TEMPLATE_TYPE_REQUEST]);
 //        GeneratePdf::dispatch($filePath, $book);//队列
         return $filePath;
     }
@@ -117,5 +118,21 @@ class RequestBookLogic extends Logic
         }
         $filePath = 'pdfs/' . date('Ymd') . '/' . $fileName;
         return compact('fileName', 'filePath');
+    }
+
+    /**
+     * 导出文件流 template_type 2book_notice 3handing
+     * @param $request
+     * @return mixed
+     */
+    public static function pdfByStream($request)
+    {
+        $data = $request->all();
+        $template = PdfEnum::TEMPLATE_VIEW[$request['template_type']];
+        if ($request['template_type'] == PdfEnum::TEMPLATE_TYPE_NOTICE){
+            $data['img'] =  imgToBase64(public_path('chz.png'));
+            $data['address'] =  PdfEnum::ADDRESS[$request['address']] ?? '';
+        }
+        return (new PdfUtils())->pdfStream($request->all(), $template);
     }
 }

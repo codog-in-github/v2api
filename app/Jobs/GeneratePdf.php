@@ -35,6 +35,6 @@ class GeneratePdf implements ShouldQueue
      */
     public function handle()
     {
-        (new PdfUtils())->generatePdf($this->filePath, $this->book);
+
     }
 }
