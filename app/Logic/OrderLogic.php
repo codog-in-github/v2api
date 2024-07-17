@@ -224,7 +224,17 @@ class OrderLogic extends Logic
         if ($request['at_me']){
             $query->where('receive_id', auth('user')->user()->id);
         }
-        $list = $query->get();
+        if ($request['min_id']){
+            $query->where('id', '>', $request['min_id']);
+        }
+        if ($request['max_id']){
+            $query->where('id', '<', $request['max_id']);
+        }
+        if ($request['page_size']){
+            $list = $query->paginate($request['page_size'] ?? 10);
+        }else{
+            $list = $query->get();
+        }
         foreach ($list as $value){
             $value->at_me = $value->receive_id == auth('user')->user()->id ? 1 : 0;
         }

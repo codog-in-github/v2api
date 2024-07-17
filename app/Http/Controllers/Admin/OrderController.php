@@ -112,14 +112,16 @@ class OrderController extends Controller
         return $this->success(OrderLogic::sendMessage($request));
     }
 
-    /**
-     * 订单留言列表
-     * @param OrderRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function messageList(OrderRequest $request)
     {
-        return $this->success(OrderLogic::messageList($request));
+        $list = OrderLogic::messageList($request);
+        if ($request['page_size']){
+            return $this->pageReturn($list->items(), $list->total());
+        }else{
+            return $this->success($list);
+        }
+
     }
 
     /**
