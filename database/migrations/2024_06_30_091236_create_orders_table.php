@@ -74,6 +74,12 @@ class CreateOrdersTable extends Migration
             $table->tinyInteger('status')->default(0)->comment('订单大状态0未开始 1进行中 2已完成 3订单终止');
             $table->date('finish_at')->nullable()->comment('完成或者终止时间');
 
+            $table->string('assign_user')->default(0)->comment('任务指派人');
+            $table->dateTime('assign_at')->nullable()->comment('指派时间');
+            $table->string('task_user')->default(0)->comment('任务操作人');
+            $table->dateTime('task_finish_at')->nullable()->comment('任务完成时间');
+            $table->string('task_remark')->default('')->comment('任务备注');
+
             $table->tinyInteger('apply_num')->default(0)->comment('给会计的申请数量');
 
             $table->timestamps();

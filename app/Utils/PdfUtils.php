@@ -6,26 +6,18 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfUtils
 {
-    protected int $templateType = 1;
-    public function __construct($templateType)
+    public function generatePdf($filePath, $data, $template)
     {
-        $this->templateType = $templateType;
-    }
-    public function generatePdf($filePath, $book)
-    {
-        $template = $this->getTemplate();
-        $pdf = Pdf::loadView($template, ['data' => $book]);
+        $pdf = Pdf::loadView($template, $data);
         Storage::disk('public')->put($filePath, $pdf->output());
         return $filePath;
+//        return $pdf->stream();
     }
 
-    protected function getTemplate()
+    public function pdfStream($data, $template)
     {
-        $templates = [
-            1 => 'pdfs/request_book',
-            2 => 'pdfs/book_notice',
-            3 => 'pdfs/handing',
-        ];
-        return $templates[$this->templateType];
+        $pdf = Pdf::loadView($template, $data);
+        return $pdf->stream();
     }
+
 }

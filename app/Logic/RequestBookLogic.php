@@ -2,6 +2,7 @@
 
 namespace App\Logic;
 
+use App\Enum\PdfEnum;
 use App\Exceptions\ErrorException;
 use App\Jobs\GeneratePdf;
 use App\Models\RequestBook;
@@ -89,16 +90,18 @@ class RequestBookLogic extends Logic
      */
     public static function generatePdf(RequestBook $book)
     {
-        $fileName = self::getPdfName($book);
-        $filePath = 'pdfs/' . date('Ymd') . '/' . $fileName;
-        GeneratePdf::dispatch($filePath, $book);
+        $res = self::getPdfName($book);
+        $fileName = $res['fileName'];
+        $filePath = $res['filePath'];
+        (new PdfUtils())->generatePdf($filePath, $book, PdfEnum::TEMPLATE_VIEW[PdfEnum::TEMPLATE_TYPE_REQUEST]);
+//        GeneratePdf::dispatch($filePath, $book);//队列
         return $filePath;
     }
 
     /**
-     * 生成pdf文件名
+     * 生成request pdf文件名
      * @param $book
-     * @return string
+     * @return array
      */
     public static function getPdfName($book)
     {
@@ -109,6 +112,27 @@ class RequestBookLogic extends Logic
         $fileName .= $books->where('type', $book->type)->count();
         $fileName .= '-' . $book->order->bkg_no . '-';
         $fileName .= $books->count();
-        return $fileName;
+        $dir = public_path('/pdfs/' . date('Ymd'));
+        if (!is_dir($dir)){
+            mkdir($dir);
+        }
+        $filePath = 'pdfs/' . date('Ymd') . '/' . $fileName;
+        return compact('fileName', 'filePath');
+    }
+
+    /**
+     * 导出文件流 template_type 2book_notice 3handing
+     * @param $request
+     * @return mixed
+     */
+    public static function pdfByStream($request)
+    {
+        $data = $request->all();
+        $template = PdfEnum::TEMPLATE_VIEW[$request['template_type']];
+        if ($request['template_type'] == PdfEnum::TEMPLATE_TYPE_NOTICE){
+            $data['img'] =  imgToBase64(public_path('chz.png'));
+            $data['address'] =  PdfEnum::ADDRESS[$request['address']] ?? '';
+        }
+        return (new PdfUtils())->pdfStream($request->all(), $template);
     }
 }

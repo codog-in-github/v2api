@@ -68,7 +68,7 @@ class OrderController extends Controller
 
     public function detail(OrderRequest $request)
     {
-        return $this->success(OrderLogic::detail($request->get('id')));
+        return $this->success(OrderLogic::detail($request->get('keyword')));
     }
 
     public function editOrder(OrderRequest $request)
@@ -161,6 +161,11 @@ class OrderController extends Controller
     public function sendEmail(OrderRequest $request)
     {
         return $this->success(OrderLogic::sendEmail($request));
+    }
+
+    public function changeNodeStatus(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::changeNodeStatus($request));
     }
 
 

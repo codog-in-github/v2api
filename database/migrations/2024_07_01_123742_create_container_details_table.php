@@ -26,7 +26,7 @@ class CreateContainerDetailsTable extends Migration
             $table->string('tel')->default('')->comment('联络方式');
             $table->string('car')->default('')->comment('车号');
             $table->string('container')->default('')->comment('集装箱');
-            $table->string('sear')->default('')->comment('封装');
+            $table->string('seal')->default('')->comment('封装');
             $table->string('tare')->default('')->comment('重量');
             $table->tinyInteger('tare_type')->default(1)->comment('重量类型1 吨 2 kg');
             $table->timestamps();

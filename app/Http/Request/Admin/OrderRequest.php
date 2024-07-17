@@ -34,7 +34,7 @@ class OrderRequest extends FormRequest
                 ];
             case 'admin/order/detail':
                 return [
-                    'id' => 'required'
+                    'keyword' => 'required'
                 ];
             case 'admin/order/edit_order':
                 return [
@@ -45,6 +45,7 @@ class OrderRequest extends FormRequest
                     'containers.*.id' => 'nullable|integer',
                     'containers.*.common' => 'integer',
                     'containers.*.container_type' => 'integer',
+                    'containers.*.quantity' => 'integer',
                     'containers.*.details' => 'array',
                     'containers.*.details.*.van_place' => 'required',
                     'containers.*.details.*.van_type' => 'required',
@@ -56,7 +57,7 @@ class OrderRequest extends FormRequest
                     'containers.*.details.*.tel' => 'required',
                     'containers.*.details.*.car' => 'required',
                     'containers.*.details.*.container' => 'required',
-                    'containers.*.details.*.sear' => 'required',
+                    'containers.*.details.*.seal' => 'required',
                     'containers.*.details.*.tare' => 'required',
                 ];
             case 'admin/order/save_file':
@@ -87,6 +88,11 @@ class OrderRequest extends FormRequest
                     'subject'   => 'required|string',
                     'content'   => 'required|string',
                     'to'        => 'required',
+                ];
+            case 'admin/order/change_node_status':
+                return [
+                    'id'            => 'required',
+                    'is_enable'     => 'required|in:0,1',
                 ];
             default:
                 return [];
