@@ -65,6 +65,7 @@ class UserController extends Controller
         if (is_numeric($request['enable'])){
             $query->where('enable', $request['enable']);
         }
-        return $query->select('id', 'username', 'role_id', 'name', 'tag', 'enable')->get();
+        $list = $query->select('id', 'username', 'role_id', 'name', 'tag', 'enable')->get();
+        return $this->success($list);
     }
 }

@@ -86,9 +86,13 @@ class OrderLogic extends Logic
         return Order::query()
             ->with(['containers', 'nodes', 'files', 'messages', 'requestBooks'])
             ->where(function ($query)use($keyword){
-                $query->orWhere('id', $keyword)
-                    ->orWhere('order_no', $keyword)
-                    ->orWhere('bkg_no', $keyword);
+                if (is_numeric($keyword)) {
+                    $query->where('id', $keyword);
+                } elseif(preg_match("/^(:?[123]-)?\d+K$/", $keyword)) {
+                    $query->where('order_no', $keyword);
+                } else {
+                    $query->where('bkg_no', $keyword);
+                }
             })->first();
     }
 
@@ -207,7 +211,17 @@ class OrderLogic extends Logic
         if ($request['at_me']){
             $query->where('receive_id', auth('user')->user()->id);
         }
-        $list = $query->get();
+        if ($request['min_id']){
+            $query->where('id', '>', $request['min_id']);
+        }
+        if ($request['max_id']){
+            $query->where('id', '<', $request['max_id']);
+        }
+        if ($request['page_size']){
+            $list = $query->paginate($request['page_size'] ?? 10);
+        }else{
+            $list = $query->get();
+        }
         foreach ($list as $value){
             $value->at_me = $value->receive_id == auth('user')->user()->id ? 1 : 0;
         }
