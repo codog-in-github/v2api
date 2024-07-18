@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
+use Tymon\JWTAuth\JWTAuth;
 
 class UserController extends Controller
 {
@@ -24,7 +25,7 @@ class UserController extends Controller
         $credentials['username']= $request->username;
         $credentials['password'] = $request->password;
         $credentials['enable'] = 1;
-        if (!$token = Auth::guard('user')->attempt($credentials, ['exp' => Carbon::now()->addDays(15)->timestamp])) {
+        if (!$token = Auth::guard('user')->attempt($credentials)) {
             // errorUnauthorized 返回响应码401 token失效也是401 不利于前端区分 增加额外错误码作为更详细的区分
             // return $this->response->errorUnauthorized('用户名或密码错误');
             throw new ErrorException('用户名或密码错误');
@@ -51,7 +52,7 @@ class UserController extends Controller
         return [
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_in' => Auth::guard('user')->factory()->getTTL() * 60 * 15
+            'expires_in' => Auth::guard('user')->factory()->getTTL()
         ];
     }
 
