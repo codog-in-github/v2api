@@ -73,7 +73,6 @@ class OrderRequest extends FormRequest
             case 'admin/order/send_message':
                 return [
                     'order_id' => 'required',
-                    'receive_id' => 'required',
                     'content' => 'required',
                 ];
             case 'admin/order/update_ship_schedule':

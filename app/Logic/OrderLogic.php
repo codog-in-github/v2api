@@ -190,19 +190,25 @@ class OrderLogic extends Logic
     public static function sendMessage($request)
     {
         $sender = auth('user')->user();
-        $receiver = User::query()->where('enable', 1)->find($request['receive_id']);
-        if (!$sender || !$receiver) {
+        if (!$sender) {
             throw new ErrorException('受信者は存在しません');
         }
-        return OrderMessage::query()->create([
+        $messageData = [
             'order_id' => $request['order_id'],
             'content' => $request['content'],
             'send_id' => $sender['id'],
             'sender' => $sender['username'],
-            'receive_id' => $receiver['id'],
-            'receiver' => $receiver['username'],
             'is_read' => 0,
-        ]);
+        ];
+        if($request['receive_id']) {
+            $receiver = User::query()->where('enable', 1)->find($request['receive_id']);
+            if(!$receiver) {
+                throw new ErrorException('受信者は存在しません');
+            }
+            $messageData['receive_id'] = $receiver['id'];
+            $messageData['receiver'] = $receiver['username'];
+        }
+        return OrderMessage::query()->create($messageData);
     }
 
     public static function messageList($request)
