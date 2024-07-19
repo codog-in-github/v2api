@@ -19,7 +19,13 @@ class OrderController extends Controller
      */
     public function orderList(Request $request)
     {
-        $res = OrderLogic::orderList($request);
+        $list = OrderLogic::orderList($request);
+        return $this->pageReturn($list->items(), $list->total());
+    }
+
+    public function tabOrderList(Request $request)
+    {
+        $res = OrderLogic::tabOrderList($request);
         return $this->success($res);
     }
 
@@ -68,7 +74,7 @@ class OrderController extends Controller
 
     public function detail(OrderRequest $request)
     {
-        return $this->success(OrderLogic::detail($request->get('keyword')));
+        return $this->success(OrderLogic::detail($request));
     }
 
     public function editOrder(OrderRequest $request)
@@ -166,6 +172,12 @@ class OrderController extends Controller
     public function changeNodeStatus(OrderRequest $request)
     {
         return $this->success(OrderLogic::changeNodeStatus($request));
+    }
+
+    //置顶
+    public function changeTop(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::changeTop($request));
     }
 
 

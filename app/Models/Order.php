@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Order extends Model
 {
     use SoftDeletes;
-
     protected $fillable = [
         'old_id', 'bkg_date', 'bkg_no', 'bl_no', 'bkg_type', 'month', 'month_no', 'tag', 'company_name', 'short_name',
         'zip_code', 'address', 'header', 'mobile', 'legal_number', 'carrier', 'c_staff', 'service', 'vessel_name', 'voyage',
@@ -55,7 +54,7 @@ class Order extends Model
 
     public function messages()
     {
-        return $this->hasMany(OrderMessage::class, 'order_id', 'id')->latest();
+        return $this->hasMany(OrderMessage::class, 'order_id', 'id');
     }
 
     public function requestBooks()
@@ -129,7 +128,7 @@ class Order extends Model
 
     /**
      * 返回对应状态的节点id
-     * @param $nodeStatus
+     * @param $nodeStatus //对应页面的9个tab页
      * @return int|int[]
      */
     public static function getNodeId($nodeStatus)

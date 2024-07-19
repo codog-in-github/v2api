@@ -34,7 +34,8 @@ class OrderRequest extends FormRequest
                 ];
             case 'admin/order/detail':
                 return [
-                    'keyword' => 'required'
+                    'id'        => 'required_without::keyword',
+                    'keyword'   => 'required_without:id'
                 ];
             case 'admin/order/edit_order':
                 return [
@@ -92,6 +93,11 @@ class OrderRequest extends FormRequest
                 return [
                     'id'            => 'required',
                     'is_enable'     => 'required|in:0,1',
+                ];
+            case 'admin/order/change_top':
+                return [
+                    'id'        => 'required',
+                    'is_top'    => 'required|in:0,1',
                 ];
             default:
                 return [];

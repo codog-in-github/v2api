@@ -2,6 +2,7 @@
 
 namespace App\Logic;
 use App\Enum\CodeEnum;
+use App\Enum\OrderEnum;
 use App\Exceptions\ErrorException;
 use App\Http\Resources\OrderResource;
 use App\Mail\MailCustom;
@@ -25,33 +26,75 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderLogic extends Logic
 {
+    public static function tabOrderList(Request $request)
+    {
+        if (!is_numeric($request['status'])){
+            $request->offsetSet('status', OrderEnum::STATUS_ING);
+        }
+        $query = Order::query()->filter(new OrderFilter($request))->with(['requestBooks', 'nodes'])
+            ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
+                'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id');
+        if ($request['status'] == OrderEnum::STATUS_ING){
+            $list = $query->latest()->get();
+            if ($request['node_status'] && in_array($request['node_status'], [4,5,6,7])){
+                foreach ($list as $value){
+                    $value['color'] = Order::getColor($request['node_status'], $value);
+                }
+                //排序
+                $colors = array_column($list, 'color');
+                array_multisort($colors, SORT_DESC, $list);
+            }
+            if ($request['node_status'] && $request['node_status'] == 8) {
+                foreach ($list as $value){
+                    $value['color'] = $value->apply_num > 0 ? CodeEnum::COLOR_RED : CodeEnum::COLOR_GREEN;
+                }
+                //排序
+                $colors = array_column($list, 'color');
+                array_multisort($colors, SORT_DESC, $list);
+            }
+            if ($request['node_status'] && $request['node_status'] == 9) {
+                foreach ($list as $value){
+                    $value['color'] = $value->requestBooks->where('is_confirm', 0)->count() > 0 ? CodeEnum::COLOR_RED : CodeEnum::COLOR_GREEN ;
+                }
+                //排序
+                $colors = array_column($list, 'color');
+                array_multisort($colors, SORT_DESC, $list);
+            }
+            if (in_array($request['node_status'], [4,5,6,7,8,9])){
+                $topArr = [];
+                $nonTop = [];
+                $nodeId = Order::getNodeId($request['node_status']);
+                foreach ($list as $value){
+                    $node = $value->nodes->where('node_id', $nodeId)->first();
+                    if ($node && $node->is_top){
+                        //加入置顶
+                        $value->top_at = $node->top_at;
+                        $topArr[] = $value;
+                    }else{
+                        $nonTop[] = $value;
+                    }
+                }
+                $list = array_merge($topArr, $nonTop);
+
+            }
+        }else{
+            $list = $query->latest()->limit(10)->get();
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public static function orderList(Request $request)
     {
-        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')->latest()->get();
-        if ($request['node_status'] && in_array($request['node_status'], [4,5,6,7])){
-            foreach ($list as $value){
-                $value['top'] = Order::getColor($request['node_status'], $value);
-            }
-            //排序
-            $tops = array_column($list, 'top');
-            array_multisort($tops, SORT_DESC, $list);
-        }
-        if ($request['node_status'] && $request['node_status'] == 8) {
-            foreach ($list as $value){
-                $value['top'] = $value->apply_num > 0 ? CodeEnum::COLOR_RED : CodeEnum::COLOR_GREEN;
-            }
-            //排序
-            $tops = array_column($list, 'top');
-            array_multisort($tops, SORT_DESC, $list);
-        }
-        if ($request['node_status'] && $request['node_status'] == 9) {
-            foreach ($list as $value){
-                $value['top'] = $value->requestBooks->where('is_confirm', 0)->count() > 0 ? CodeEnum::COLOR_RED : CodeEnum::COLOR_GREEN ;
-            }
-            //排序
-            $tops = array_column($list, 'top');
-            array_multisort($tops, SORT_DESC, $list);
-        }
+        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')
+            ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
+                'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id')
+            ->latest()->paginate($request['page_size'] ?? 10);
+        //todo
         return $list;
     }
 
@@ -81,11 +124,15 @@ class OrderLogic extends Logic
 
     }
 
-    public static function detail($keyword)
+    public static function detail($request)
     {
-        return Order::query()
-            ->with(['containers', 'nodes', 'files', 'messages', 'requestBooks'])
-            ->where(function ($query)use($keyword){
+        $query = Order::query()
+            ->with(['containers', 'nodes', 'files', 'messages', 'requestBooks']);
+        if ($request['id']){
+            return $query->find($request['id']);
+        }else{
+            $keyword = $request['keyword'];
+            return $query->where(function ($query)use($keyword){
                 if (is_numeric($keyword)) {
                     $query->where('id', $keyword);
                 } elseif(preg_match("/^(:?[123]-)?\d+K$/", $keyword)) {
@@ -94,6 +141,7 @@ class OrderLogic extends Logic
                     $query->where('bkg_no', $keyword);
                 }
             })->first();
+        }
     }
 
     public static function editOrder($request)
@@ -104,11 +152,11 @@ class OrderLogic extends Logic
 //        }
         DB::beginTransaction();
         try {
-
-            if (!$order['bkg_type'] &&  $request['bkg_type']) {
+            $order->fill($request->all());
+            if ($order->isDirty('bkg_type') && $order->getOriginal('bkg_type') == 0) {
                 self::createNode($order, $request['node_ids'] ?? []);
             }
-            $order->fill($request->all())->save();
+            $order->save();
             if ($order->status == config('order')['order_status_un']){
                 $order->status == config('order')['order_status_ing'];
             }
@@ -136,7 +184,6 @@ class OrderLogic extends Logic
             DB::rollBack();
             throw new ErrorException($e->getMessage());
         }
-
     }
 
     public static function delete($request)
@@ -206,7 +253,7 @@ class OrderLogic extends Logic
                 throw new ErrorException('受信者は存在しません');
             }
             $messageData['receive_id'] = $receiver['id'];
-            $messageData['receiver'] = $receiver['username'];
+            $messageData['receiver'] = $receiver['name'];
         }
         return OrderMessage::query()->create($messageData);
     }
@@ -344,6 +391,21 @@ class OrderLogic extends Logic
             return $orderNode;
         }
         $orderNode->is_enable = $request['is_enable'];
+        $orderNode->save();
+        return $orderNode;
+    }
+
+    //置顶 取消置顶
+    public static function changeTop($request)
+    {
+        $orderNode = OrderNode::query()->findOrFail($request['id']);
+        if ($orderNode->is_top == $request['is_top']){
+            throw new ErrorException('コンシステント状態');
+        }
+        $orderNode->is_top = $request['is_top'];
+        if ($request['is_top']){
+            $orderNode->top_at = date('Y-m-d H:i:s');
+        }
         $orderNode->save();
         return $orderNode;
     }

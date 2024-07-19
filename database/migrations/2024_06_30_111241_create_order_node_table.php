@@ -19,10 +19,9 @@ class CreateOrderNodeTable extends Migration
             $table->integer('node_id')->comment('节点id');
             $table->tinyInteger('sort')->comment('节点顺序');
             $table->boolean('is_enable')->default(0)->comment('是否启用');
-//            $table->tinyInteger('status')->default(0)->comment('节点状态0未开始 1进行中 2已结束');
             $table->tinyInteger('mail_status')->default(0)->comment('送信状态0否 是1');
-            $table->dateTime('start_time')->nullable()->comment('节点开始时间');
-            $table->dateTime('end_time')->nullable()->comment('节点结束时间');
+            $table->boolean('is_top')->default(0)->comment('是否置顶0否 1是');
+            $table->dateTime('top_at')->nullable()->comment('置顶时间');
             $table->timestamps();
 
             $table->index('order_id');

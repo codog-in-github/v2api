@@ -59,6 +59,7 @@ Route::group([
         //订单
         Route::group(['prefix' => 'order'], function (){
             Route::get('list', 'OrderController@orderList');
+            Route::get('tab_order_list', 'OrderController@tabOrderList'); //tab页特殊订单列表
             Route::post('create', 'OrderController@createOrder');
             Route::get('detail', 'OrderController@detail');
             Route::post('edit_order', 'OrderController@editOrder');
@@ -75,7 +76,9 @@ Route::group([
             Route::post('update_ship_schedule', 'OrderController@updateShipSchedule'); //船期更新
             Route::post('send_email', 'OrderController@sendEmail'); //批量发送邮件
             Route::post('change_node_status', 'OrderController@changeNodeStatus'); //节点开关闭
-            Route::post('copy_order', 'OrderController@copyOrder'); //类似事件
+            Route::post('change_top', 'OrderController@changeTop'); //类似事件
+//            Route::post('copy_order', 'OrderController@copyOrder'); //类似事件
+
         });
 
         //请求书
