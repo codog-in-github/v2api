@@ -376,6 +376,12 @@ class OrderLogic extends Logic
         $to = is_array($request['to']) ? $request['to'] : explode(',', $request['to']);
         $from = auth('user')->user()->email ?? env('MAIL_FROM_ADDRESS');
         $name = auth('user')->user()->name ?? env('MAIL_FROM_NAME');
+        if ($request['node_id']){
+            OrderNode::query()->where('id', $request['node_id'])->update([
+                'is_enable'     => 0,
+                'mail_status'   => 1
+            ]);
+        }
         Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
     }

@@ -90,10 +90,11 @@ class OrderFilter extends BaseFilter
                 ->where('is_enable', 1)
                 ->where('mail_status', 0);
             })->orWhereHas('nodes', function ($query){
+                //手动置顶的节点
                 $query->where('is_top', 1)
                     ->where('is_enable', 1);
             })
-                ->orWhere('bkg_type', 0)
+                ->orWhere('bkg_type', 0) //没有订单类型的
                 ->orWhere('apply_num', '>', 0); //存在向会计申请的;
         }
         if (in_array($nodeStatus, [8,9])){
