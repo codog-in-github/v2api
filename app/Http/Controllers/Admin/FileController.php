@@ -9,10 +9,17 @@ class FileController extends Controller
 {
     public function upload(Request $request)
     {
+        $this->validate($request,[
+            'file'          => 'required',
+            'order_id'      => 'required',
+        ], [
+            'file.*'        => '状态有误',
+            'order_id.*'    => 'id有误',
+        ]);
         $file = $request->file('file');
         try {
             $fileName = $file->getClientOriginalName();
-            $dir =  'file/' . date('Ymd');
+            $dir =  'file/' . $request['id'];
             $baseDir = public_path() . '/' . $dir;
             if (!is_dir($baseDir)){
                 @mkdir($baseDir);
