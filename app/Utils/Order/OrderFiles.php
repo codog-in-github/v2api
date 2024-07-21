@@ -5,10 +5,9 @@ namespace App\Utils\Order;
 class OrderFiles
 {
     public static $intance = null;
+
     protected string $HTTP_BASE_DIR = '';
-
     protected string $BASE_DIR = '';
-
     protected string $RECYCLE_BIN = '';
 
     protected function __construct()
