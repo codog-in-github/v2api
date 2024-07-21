@@ -39,10 +39,7 @@ class OrderFiles
     public function getAsHttpURI(int $orderId, bool $group = false): array
     {
         $files = $this->getOrderFiles($orderId, $group);
-        if(!isset($files[0])) {
-            return [];
-        }
-        if(is_string($files[0])) {
+        if(!$group) {
             return array_map([$this, 'toHttpURI'], $files);
         }
         $groups = [];
@@ -97,11 +94,14 @@ class OrderFiles
             $orderId.
             DIRECTORY_SEPARATOR.
             $type;
+        if(is_file($fileDir. DIRECTORY_SEPARATOR. $fileName)){
+            throw new \Exception("file exists");
+        }
         if(!is_dir($fileDir)){
             mkdir($fileDir, 0777, true);
         }
         copy($file, $fileDir. DIRECTORY_SEPARATOR. $fileName);
-        return $orderId. DIRECTORY_SEPARATOR. $type;
+        return $orderId. DIRECTORY_SEPARATOR. $type. DIRECTORY_SEPARATOR. $fileName;
     }
 
     public function unlink($file)
