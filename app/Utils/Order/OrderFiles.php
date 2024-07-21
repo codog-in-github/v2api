@@ -76,6 +76,8 @@ class OrderFiles
      * @throws \Exception
      */
     public function getOrderFiles(int $orderId, bool $group = false): array {
+        if(!is_dir($this->BASE_DIR. $orderId))
+          return [];
         if(!$group) {
             return $this->ls($orderId . DIRECTORY_SEPARATOR);
         }

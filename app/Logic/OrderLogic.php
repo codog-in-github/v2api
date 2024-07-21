@@ -145,7 +145,7 @@ class OrderLogic extends Logic
             })->first();
         }
         $orderDetail = $orderDetail->toArray();
-        $orderDetail['files'] = OrderFiles::getInstance()->getAsHttpURI($orderDetail['id']);
+        $orderDetail['files'] = OrderFiles::getInstance()->getAsHttpURI($orderDetail['id'], true);
         return $orderDetail;
     }
 
