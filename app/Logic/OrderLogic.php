@@ -19,6 +19,7 @@ use App\Models\OrderMessage;
 use App\Models\OrderNode;
 use App\Models\RequestBook;
 use App\Models\User;
+use App\Utils\Order\OrderFiles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -127,12 +128,13 @@ class OrderLogic extends Logic
     public static function detail($request)
     {
         $query = Order::query()
-            ->with(['containers', 'nodes', 'files', 'messages', 'requestBooks']);
+            ->with(['containers', 'nodes', 'messages', 'requestBooks']);
+
         if ($request['id']){
-            return $query->find($request['id']);
+            $orderDetail = $query->find($request['id']);
         }else{
             $keyword = $request['keyword'];
-            return $query->where(function ($query)use($keyword){
+            $orderDetail = $query->where(function ($query)use($keyword){
                 if (is_numeric($keyword)) {
                     $query->where('id', $keyword);
                 } elseif(preg_match("/^(:?[123]-)?\d+K$/", $keyword)) {
@@ -142,6 +144,9 @@ class OrderLogic extends Logic
                 }
             })->first();
         }
+        $orderDetail = $orderDetail->toArray();
+        $orderDetail['files'] = OrderFiles::getInstance()->getAsHttpURI($orderDetail['id']);
+        return $orderDetail;
     }
 
     public static function editOrder($request)
