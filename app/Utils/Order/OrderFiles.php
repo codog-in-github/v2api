@@ -36,6 +36,19 @@ class OrderFiles
         }
         return $this->HTTP_BASE_DIR . $fsURI;
     }
+    public function toFilePath(string $HTTPURI): string
+    {
+        if(!strstr($HTTPURI, $this->HTTP_BASE_DIR)) {
+            throw new \Exception('invalid http uri');
+        }
+        $fsURI = str_replace($this->HTTP_BASE_DIR, '', $HTTPURI);
+
+        if(DIRECTORY_SEPARATOR === '\\') {
+            $fsURI = str_replace('/', '\\', $fsURI);
+        }
+        return $this->BASE_DIR. $fsURI;
+    }
+
 
     public function getAsHttpURI(int $orderId, bool $group = false): array
     {
