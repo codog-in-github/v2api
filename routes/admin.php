@@ -25,6 +25,7 @@ Route::group([
         'middleware' => ['jwt.auth']
     ], function () {
         Route::post('upload_file', 'FileController@upload');
+        Route::post('delete_files', 'FileController@delete');
 
         Route::get('bank_list', 'BankController@list');
         Route::get('select_list', 'BankController@selectList');

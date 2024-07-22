@@ -35,9 +35,10 @@ class OrderFiles
         }
         return $this->HTTP_BASE_DIR . $fsURI;
     }
+    
     public function toFilePath(string $HTTPURI): string
     {
-        if(!strstr($HTTPURI, $this->HTTP_BASE_DIR)) {
+        if(strpos($HTTPURI, $this->HTTP_BASE_DIR) !== 0) {
             throw new \Exception('invalid http uri');
         }
         $fsURI = str_replace($this->HTTP_BASE_DIR, '', $HTTPURI);
@@ -45,7 +46,7 @@ class OrderFiles
         if(DIRECTORY_SEPARATOR === '\\') {
             $fsURI = str_replace('/', '\\', $fsURI);
         }
-        return $this->BASE_DIR. $fsURI;
+        return $fsURI;
     }
 
 
@@ -119,11 +120,15 @@ class OrderFiles
 
     public function unlink($file)
     {
-        if(!is_file($file)) {
-            throw new \Exception("file not exists");
+        if(strpos($file, '..')) {
+            throw new \Exception("invalid filepath");
         }
-        $fileHash = hash_file('sha256', $file);
-        rename($this->BASE_DIR. $file, $this->RECYCLE_BIN. $fileHash);
+        $delFile = $this->BASE_DIR. $file;
+        if(!is_file($delFile)) {
+            throw new \Exception("$delFile not exists");
+        }
+        $fileHash = hash_file('sha256', $delFile);
+        rename($delFile, $this->RECYCLE_BIN. $fileHash);
         return $fileHash;
     }
 }

@@ -35,4 +35,20 @@ class FileController extends Controller
             throw new ErrorException($e->getMessage());
         }
     }
+    public function delete(Request $request)
+    {
+        $this->validate($request,[
+            'files' => 'required',
+            'files' => 'array',
+        ]);
+        try {
+          $orderFiles = OrderFiles::getInstance();
+          foreach(array_map([$orderFiles, 'toFilePath'], $request->get('files')) as $fileDir) {
+            $orderFiles->unlink($fileDir);
+          }
+          return $this->success('');
+        }catch (\Exception $e){
+            throw new ErrorException($e->getMessage());
+        }
+    }
 }
