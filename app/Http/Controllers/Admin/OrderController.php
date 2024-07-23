@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
+use App\Enum\OrderEnum;
 use App\Exceptions\ErrorException;
 use App\Http\Controllers\Controller;
 use App\Http\Request\Admin\OrderRequest;
@@ -178,6 +179,12 @@ class OrderController extends Controller
     public function changeTop(OrderRequest $request)
     {
         return $this->success(OrderLogic::changeTop($request));
+    }
+
+    public function bkgTypeText()
+    {
+        $list = OrderEnum::BKG_TYPE_TEXT_ARR;
+        return $this->success($list);
     }
 
 

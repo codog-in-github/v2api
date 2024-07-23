@@ -77,9 +77,9 @@ Route::group([
             Route::post('update_ship_schedule', 'OrderController@updateShipSchedule'); //船期更新
             Route::post('send_email', 'OrderController@sendEmail'); //批量发送邮件
             Route::post('change_node_status', 'OrderController@changeNodeStatus'); //节点开关闭
-            Route::post('change_top', 'OrderController@changeTop'); //类似事件
+            Route::post('change_top', 'OrderController@changeTop'); //置顶
 //            Route::post('copy_order', 'OrderController@copyOrder'); //类似事件
-
+            Route::get('bkg_type_text', 'OrderController@bkgTypeText');//订单类型
         });
 
         //请求书
