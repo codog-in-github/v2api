@@ -142,6 +142,16 @@ class OrderController extends Controller
     }
 
     /**
+     * 我的消息数量
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unReadMessageNum(Request $request)
+    {
+        return $this->success(OrderLogic::unReadMessageNum(auth('user')->user()->id));
+    }
+
+    /**
      * 报关公司列表
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse

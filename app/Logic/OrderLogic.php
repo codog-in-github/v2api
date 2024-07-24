@@ -112,10 +112,11 @@ class OrderLogic extends Logic
         $order->creator = auth('user')->user()->username;
         DB::beginTransaction();
         try {
-            $order->save();
             if ($request['bkg_type']) {
+                $order->bkg_type_text = OrderEnum::BKG_TYPE_TEXT_ARR[$request['bkg_type']] ?? '';
                 self::createNode($order, $request['node_ids']);
             }
+            $order->save();
             DB::commit();
             return $order;
         }catch(\Exception $e){
@@ -159,6 +160,7 @@ class OrderLogic extends Logic
         try {
             $order->fill($request->all());
             if ($order->isDirty('bkg_type') && $order->getOriginal('bkg_type') == 0) {
+                $order->bkg_type_text = OrderEnum::BKG_TYPE_TEXT_ARR[$request['bkg_type']] ?? '';
                 self::createNode($order, $request['node_ids'] ?? []);
             }
             $order->save();
@@ -286,6 +288,19 @@ class OrderLogic extends Logic
         return $list;
     }
 
+    /**
+     * 消息数量
+     * @param $receiver //接收人
+     * @param $is_read //是否已读
+     * @return int
+     */
+    public static function unReadMessageNum($receiver, bool $is_read = false) :int
+    {
+        return OrderMessage::query()->where([
+            'receiver'  => $receiver,
+            'is_read'   => $is_read,
+        ])->count();
+    }
     public static function readMessage($request)
     {
         return OrderMessage::query()->where('id', $request['id'])->update(['is_read' => 1]);

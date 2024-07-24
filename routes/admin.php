@@ -80,6 +80,7 @@ Route::group([
             Route::post('change_top', 'OrderController@changeTop'); //置顶
 //            Route::post('copy_order', 'OrderController@copyOrder'); //类似事件
             Route::get('bkg_type_text', 'OrderController@bkgTypeText');//订单类型
+            Route::get('un_read_message_num', 'OrderController@unReadMessageNum');//我的消息数量
         });
 
         //请求书
