@@ -288,6 +288,19 @@ class OrderLogic extends Logic
         return $list;
     }
 
+    /**
+     * 消息数量
+     * @param $receiver //接收人
+     * @param $is_read //是否已读
+     * @return int
+     */
+    public static function unReadMessageNum($receiver, bool $is_read = false) :int
+    {
+        return OrderMessage::query()->where([
+            'receiver'  => $receiver,
+            'is_read'   => $is_read,
+        ])->count();
+    }
     public static function readMessage($request)
     {
         return OrderMessage::query()->where('id', $request['id'])->update(['is_read' => 1]);
