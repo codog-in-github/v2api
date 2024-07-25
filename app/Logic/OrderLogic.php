@@ -252,7 +252,7 @@ class OrderLogic extends Logic
             'order_id' => $request['order_id'],
             'content' => $request['content'],
             'send_id' => $sender['id'],
-            'sender' => $sender['username'],
+            'sender' => $sender['name'],
             'is_read' => 0,
         ];
         if($request['receive_id']) {
@@ -400,7 +400,9 @@ class OrderLogic extends Logic
         if ($request['node_id']){
             OrderNode::query()->where('id', $request['node_id'])->update([
                 'is_enable'     => 0,
-                'mail_status'   => 1
+                'mail_status'   => 1,
+                'mail_at'       => date('Y-m-d H:i:s'),
+                'sender'        => auth('user')->user()->name
             ]);
         }
         Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
