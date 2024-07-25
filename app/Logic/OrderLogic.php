@@ -490,7 +490,7 @@ class OrderLogic extends Logic
                 'quantity' => $container['quantity']??0,
             ]);
             foreach ($container['details'] as $detail) {
-                Container::query()->updateOrCreate([
+                ContainerDetail::query()->updateOrCreate([
                     'id' => $detail['id'] ?? 0
                 ], [
                     'order_id' => $order->id,
