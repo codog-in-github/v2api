@@ -186,6 +186,7 @@ class OrderLogic extends Logic
                 $order = self::copyOrder($order, $request['origin_order_id']);
             }
             DB::commit();
+            $order = Order::query()->with(['nodes', 'containers','containers.details'])->find($order['id']);
             return $order;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -485,8 +486,8 @@ class OrderLogic extends Logic
                 'id' => $container['id'] ?? 0
             ], [
                 'order_id' => $order->id,
-                'common' => $container['common'],
-                'container_type' => $container['container_type'],
+                'common' => $container['common'] ?? '',
+                'container_type' => $container['container_type'] ?? '',
                 'quantity' => $container['quantity']??0,
             ]);
             foreach ($container['details'] as $detail) {
