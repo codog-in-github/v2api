@@ -129,7 +129,7 @@ class OrderLogic extends Logic
     public static function detail($request)
     {
         $query = Order::query()
-            ->with(['containers', 'nodes', 'messages', 'requestBooks']);
+            ->with(['containers', 'containers.details', 'nodes', 'messages', 'requestBooks']);
 
         if ($request['id']){
             $orderDetail = $query->find($request['id']);
@@ -186,7 +186,7 @@ class OrderLogic extends Logic
                 $order = self::copyOrder($order, $request['origin_order_id']);
             }
             DB::commit();
-            $order = Order::query()->with(['nodes', 'containers','containers.details'])->find($order['id']);
+//            $order = Order::query()->with(['nodes', 'containers','containers.details'])->find($order['id']);
             return $order;
         } catch (\Exception $e) {
             DB::rollBack();
