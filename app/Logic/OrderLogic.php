@@ -112,11 +112,11 @@ class OrderLogic extends Logic
         $order->creator = auth('user')->user()->username;
         DB::beginTransaction();
         try {
+            $order->save();
             if ($request['bkg_type']) {
                 $order->bkg_type_text = OrderEnum::BKG_TYPE_TEXT_ARR[$request['bkg_type']] ?? '';
                 self::createNode($order, $request['node_ids']);
             }
-            $order->save();
             DB::commit();
             return $order;
         }catch(\Exception $e){
