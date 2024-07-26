@@ -13,7 +13,7 @@ class UpdateOptionTable0726 extends Migration
      */
     public function up()
     {
-        Schema::table('option', function (Blueprint $table) {
+        Schema::table('options', function (Blueprint $table) {
             $table->string('contacts')->nullable()->default('')->comment('联系人');
             $table->string('email')->nullable()->default('')->comment('联系邮箱');
         });
