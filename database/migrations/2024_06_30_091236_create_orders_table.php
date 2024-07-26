@@ -25,7 +25,7 @@ class CreateOrdersTable extends Migration
             $table->integer('month_no')->default(0)->comment('本月第几个订单');
             $table->string('tag')->default('')->comment('标签');
             $table->string('order_no')->default('')->comment('社内管理番号年月+本月第几单+标签');
-            $table->string('custom_com_id')->default('')->comment('报关公司id');
+            $table->integer('custom_com_id')->default(0)->comment('报关公司id');
 
 //            $table->integer('node_id')->default(0)->comment('当前节点id');
 //            $table->string('node_name')->default('')->comment('当前节点中文');
