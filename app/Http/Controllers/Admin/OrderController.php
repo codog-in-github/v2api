@@ -190,6 +190,11 @@ class OrderController extends Controller
     {
         return $this->success(OrderLogic::changeTop($request));
     }
+    //置顶
+    public function nodeConfirm(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::nodeConfirm($request));
+    }
 
     public function bkgTypeText()
     {

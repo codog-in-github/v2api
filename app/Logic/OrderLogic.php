@@ -129,7 +129,7 @@ class OrderLogic extends Logic
     public static function detail($request)
     {
         $query = Order::query()
-            ->with(['containers', 'containers.details', 'nodes', 'messages', 'requestBooks']);
+            ->with(['containers', 'containers.details', 'nodes', 'messages', 'requestBooks', 'carrier']);
 
         if ($request['id']){
             $orderDetail = $query->find($request['id']);
@@ -480,7 +480,21 @@ class OrderLogic extends Logic
         return $order;
     }
 
+    public static function nodeConfirm($request)
+    {
+        $node = OrderNode::query()->find($request['id']);
+        if (!$node){
+            throw new ErrorException('ノードが存在しません');
+        }
+        if (!$node->is_enable){
+            throw new ErrorException('ノードが閉じました');
+        }
+        $node->is_config = $request['is_config'];
+        $node->save();
+        return $node->fresh();
+    }
 
+    //保存集装箱信息
     public static function saveContainers($order, $containers)
     {
         foreach ($containers as $container) {

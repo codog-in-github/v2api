@@ -94,6 +94,11 @@ class OrderRequest extends FormRequest
                     'id'            => 'required',
                     'is_enable'     => 'required|in:0,1',
                 ];
+            case 'admin/order/node_confirm':
+                return [
+                    'id'             => 'required',
+                    'is_confirm'     => 'required|in:0,1',
+                ];
             case 'admin/order/change_top':
                 return [
                     'id'        => 'required',

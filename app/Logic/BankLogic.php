@@ -35,6 +35,9 @@ class BankLogic extends Logic
         if ($request['value']){
             $query->where('value', 'like', "%{$request['value']}%");
         }
+        if ($request['select_id']){
+            $query->where('select_id', $request['select_id']);
+        }
         return $query->get();
     }
     public static function departmentList($request)
