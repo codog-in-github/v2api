@@ -17,6 +17,7 @@ use App\Models\Order;
 use App\Models\OrderFile;
 use App\Models\OrderMessage;
 use App\Models\OrderNode;
+use App\Models\OrderOperateLog;
 use App\Models\RequestBook;
 use App\Models\User;
 use App\Utils\Order\OrderFiles;
@@ -398,12 +399,14 @@ class OrderLogic extends Logic
         $from = auth('user')->user()->email ?? env('MAIL_FROM_ADDRESS');
         $name = auth('user')->user()->name ?? env('MAIL_FROM_NAME');
         if ($request['node_id']){
-            OrderNode::query()->where('id', $request['node_id'])->update([
-                'is_enable'     => 0,
+            $node = OrderNode::query()->where('id', $request['node_id'])->first();
+            $node->update([
                 'mail_status'   => 1,
                 'mail_at'       => date('Y-m-d H:i:s'),
                 'sender'        => auth('user')->user()->name
             ]);
+            //日志
+            OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
         }
         Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
@@ -490,7 +493,9 @@ class OrderLogic extends Logic
             throw new ErrorException('ノードが閉じました');
         }
         $node->is_config = $request['is_config'];
+        $node->is_enable = 0;
         $node->save();
+        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_NODE);
         return $node->fresh();
     }
 

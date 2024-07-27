@@ -17,7 +17,7 @@ class CreateOrderOperateLogsTable extends Migration
             $table->id();
             $table->integer('order_id')->comment('订单id');
             $table->tinyInteger('type')->comment('事件类型1发邮件 2节点确认');
-            $table->text('content·')->nullable()->comment('关键数据');
+            $table->text('content')->nullable()->comment('关键数据');
             $table->string('operator')->comment('操作人');
             $table->dateTime('operate_at')->comment('操作时间');
             $table->timestamps();
