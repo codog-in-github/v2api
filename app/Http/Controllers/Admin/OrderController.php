@@ -197,9 +197,9 @@ class OrderController extends Controller
     }
 
     //节点改单申请
-    public function changeOrderRequest()
+    public function changeOrderRequest(OrderRequest $request)
     {
-
+        return $this->success(OrderLogic::changeOrderRequest($request));
     }
 
     public function bkgTypeText()

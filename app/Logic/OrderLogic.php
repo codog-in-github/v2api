@@ -539,8 +539,8 @@ class OrderLogic extends Logic
         if (!$node){
             throw new ErrorException('ノードが存在しません');
         }
-        if ($node->is_enable){
-            throw new ErrorException('ノードが完了していません');
+        if (!$node->is_confirm){
+            throw new ErrorException('未確認、修正の必要なし');
         }
         $content = json_encode($request->all());
         OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_CHANGE_ORDER, $content);
