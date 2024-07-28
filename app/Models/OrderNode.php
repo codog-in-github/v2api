@@ -48,18 +48,19 @@ class OrderNode extends Model
      * 后，发送给客户
      */
     const TYPE_BL_COPY = 8;
+    const TYPE_FM = 9;
     /**
      * SUR：客户来信告知可以付钱→
      *  业务员向财务申请付款给船公司（附账单）→
      *  财务打钱给船公司后取得回执，并且邮件付款凭证给船公司→
      *  收到船公司的电放单后，业务员邮件给客户电放单
      */
-    const TYPE_SUR = 9;
+    const TYPE_SUR = 10;
     /**
      * FM：财务校对附件后付完钱→
      * 展示【船司（缩）、金额、付款时间、付款人】
      */
-    const TYPE_FM = 10;
+
     /**
      * 請：填写请求书→发送给客户
      */
@@ -67,4 +68,21 @@ class OrderNode extends Model
 
     protected $table = 'order_node';
     protected $guarded = [];
+
+    public static function changeNodeEnable($orderId, $nodeId, $enable){
+        return self::query()->where([
+            'order_id' => $orderId,
+            'node_id' => $nodeId
+        ])->update([
+            'is_enable' => $enable
+        ]);
+    }
+    public static function changeNodeConfirm($orderId, $nodeId, $confirm){
+        return self::query()->where([
+            'order_id' => $orderId,
+            'node_id' => $nodeId
+        ])->update([
+            'is_confirm' => $confirm
+        ]);
+    }
 }

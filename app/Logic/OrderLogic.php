@@ -393,6 +393,20 @@ class OrderLogic extends Logic
      */
     public static function sendEmail($request)
     {
+        if ($request['book_id']){
+            $book = RequestBook::query()->find($request['book_id']);
+            if (!$book){
+                throw new ErrorException('リクエスト情報が間違っています');
+            }
+        }
+//        if ($request['file']){
+//            //校验附件是否是pdf
+//            foreach ($request['file'] as $file){
+//                if (strstr($file, '/pdfs/')){
+//
+//                }
+//            }
+//        }
         $subject = $request['subject'];
         $content = $request['content'];//邮件内容
         $to = is_array($request['to']) ? $request['to'] : explode(',', $request['to']);
@@ -405,9 +419,25 @@ class OrderLogic extends Logic
                 'mail_at'       => date('Y-m-d H:i:s'),
                 'sender'        => auth('user')->user()->name
             ]);
-            //日志
-            OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
+            //如果是SUR 到下一步
+            if ($node['node_id'] == OrderNode::TYPE_SUR){
+                $node->step += 1;
+                $node->save();
+            }
+
+            if ($node['node_id'] == OrderNode::TYPE_REQUEST){
+                //请求书节点
+                $exists = RequestBook::query()->where([
+                    'order_id' => $node->order_id,
+                    'is_confirm' => 1
+                ])->exists();
+                if (!$exists){
+                    OrderNode::changeNodeConfirm($node->order_id, OrderNode::TYPE_REQUEST, 1);
+                }
+            }
         }
+        //日志
+        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
         Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
     }
@@ -439,6 +469,8 @@ class OrderLogic extends Logic
             $orderNode->top_at = date('Y-m-d H:i:s');
         }
         $orderNode->save();
+        $content = json_encode($request->all());
+        OrderOperateLog::writeLog($orderNode->order_id, OrderOperateLog::TYPE_NODE_TOP);
         return $orderNode;
     }
 
@@ -492,11 +524,40 @@ class OrderLogic extends Logic
         if (!$node->is_enable){
             throw new ErrorException('ノードが閉じました');
         }
-        $node->is_config = $request['is_config'];
+        $node->is_confirm = $request['is_confirm'];
         $node->is_enable = 0;
         $node->save();
-        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_NODE);
+        $content = json_encode($request->all());
+        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_NODE_CONFIRM, $content);
         return $node->fresh();
+    }
+
+    //改单申请
+    public static function changeOrderRequest($request)
+    {
+        $node = OrderNode::query()->find($request['id']);
+        if (!$node){
+            throw new ErrorException('ノードが存在しません');
+        }
+        if ($node->is_enable){
+            throw new ErrorException('ノードが完了していません');
+        }
+        $content = json_encode($request->all());
+        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_CHANGE_ORDER, $content);
+        $node->has_change_order = true;
+        if ($node->node_id = OrderNode::TYPE_BL_COPY){
+            $now = Carbon::now();
+            $node->is_top = 1;
+            $node->top_at = $now->format('Y-m-d H:i:s');
+            $node->top_finish_time = $now->addHours(3)->format('Y-m-d H:i:s');
+        }
+        if ($node->node_id == OrderNode::TYPE_SUR){
+            //SUR
+            $node->step = 1;
+            //开启FM
+            OrderNode::changeNodeEnable($node->order_id, OrderNode::TYPE_FM, 1);
+        }
+        return $node->save();
     }
 
     //保存集装箱信息
