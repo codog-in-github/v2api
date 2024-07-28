@@ -90,8 +90,10 @@ Route::group([
             Route::get('detail', 'RequestBookController@detail');
             Route::post('save', 'RequestBookController@save');
             Route::post('delete', 'RequestBookController@delete');
-            Route::post('export', 'RequestBookController@exportRequestBook');
             Route::post('change_status', 'RequestBookController@changeStatus');
+            Route::post('export', 'RequestBookController@exportRequestBook');
+            Route::post('pdf_by_stream', 'RequestBookController@pdfByStream');
+            Route::post('copy', 'RequestBookController@copy');
         });
     });
 });

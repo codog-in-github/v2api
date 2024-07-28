@@ -7,6 +7,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RequestBookExtra extends Model
 {
-    use SoftDeletes;
     protected $fillable = ['request_id', 'column', 'value'];
 }

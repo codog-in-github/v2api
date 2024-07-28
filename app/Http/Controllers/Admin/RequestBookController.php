@@ -57,13 +57,18 @@ class RequestBookController extends Controller
      */
     public function exportRequestBook(RequestBookRequest $request)
     {
-        return $this->success(RequestBookLogic::save($request));
+        return $this->success(RequestBookLogic::exportRequestBook($request));
     }
 
 
     public function pdfByStream(RequestBookRequest $request)
     {
         return $this->success(RequestBookLogic::pdfByStream($request));
+    }
+
+    public function copy(RequestBookRequest $request)
+    {
+        return $this->success(RequestBookLogic::copy($request));
     }
 
 

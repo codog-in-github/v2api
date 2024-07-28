@@ -28,6 +28,7 @@ class RequestBookLogic extends Logic
         $book = RequestBook::query()->findOrNew($request['id'] ?? 0);
         DB::beginTransaction();
         try {
+            $book->order_id = $request['order_id'];
             $book->fill($request->all())->save();
             $book->details()->createMany($request['details']);
             $book->counts()->createMany($request['counts']);
@@ -134,5 +135,24 @@ class RequestBookLogic extends Logic
             $data['address'] =  PdfEnum::ADDRESS[$request['address']] ?? '';
         }
         return (new PdfUtils())->pdfStream($request->all(), $template);
+    }
+
+    public static function copy($request)
+    {
+        $book = RequestBook::query()->findOrFail($request['id']);
+        $newBook = new RequestBook();
+        DB::beginTransaction();
+        try {
+            $newBook->fill($book->toArray())->save();
+            $newBook->details()->createMany($book->details->toArray());
+            $newBook->counts()->createMany($book->counts->toArray());
+            $newBook->extras()->createMany($book->extras->toArray());
+            $newBook->refresh();
+            DB::commit();
+            return $newBook;
+        }catch (\Exception $e){
+            DB::rollBack();
+            throw new ErrorException($e->getMessage());
+        }
     }
 }
