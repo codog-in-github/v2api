@@ -49,6 +49,15 @@ class OrderFiles
         return $fsURI;
     }
 
+    public function tryToFilePath(string $HTTPURI): string
+    {
+      try {
+        return $this->toFilePath($HTTPURI);
+      } catch(\Exception $e) {
+        return $HTTPURI;
+      }
+    }
+
 
     public function getAsHttpURI(int $orderId, bool $group = false): array
     {

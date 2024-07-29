@@ -30,7 +30,7 @@ class MailCustom extends Mailable
         $this->content = $content;
         $this->mailFrom = $from;
         $this->mailName = $name;
-        $this->files = $files;
+        $this->files = array_map([\App\Utils\Order\OrderFiles::getInstance(), 'tryToFilePath'], $files);
     }
 
     /**
@@ -42,7 +42,7 @@ class MailCustom extends Mailable
     {
         $files = is_array($this->files) ? $this->files : implode(',', $this->files);
         foreach ($files as $file){
-            $this->attach(formatFile($file));
+            $this->attach($file);
         }
         return $this->text('emails.custom')
             ->from($this->mailFrom, $this->mailName)
