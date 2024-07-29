@@ -14,8 +14,8 @@ class MailCustom extends Mailable
 
     public $subject;
     public $content;
-    public $from;
-    public $name;
+    public $mailFrom;
+    public $mailName;
     public $files;
 
     /**
@@ -28,8 +28,8 @@ class MailCustom extends Mailable
     {
         $this->subject = $subject;
         $this->content = $content;
-        $this->from = $from;
-        $this->name = $name;
+        $this->mailFrom = $from;
+        $this->mailName = $name;
         $this->files = $files;
     }
 
@@ -45,7 +45,7 @@ class MailCustom extends Mailable
             $this->attach(formatFile($file));
         }
         return $this->text('emails.custom')
-            ->from($this->from, $this->name)
+            ->from($this->mailFrom, $this->mailName)
             ->subject($this->subject)
             ->with(['content' => $this->content]);
     }

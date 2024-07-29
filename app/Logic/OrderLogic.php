@@ -435,9 +435,9 @@ class OrderLogic extends Logic
                     OrderNode::changeNodeConfirm($node->order_id, OrderNode::TYPE_REQUEST, 1);
                 }
             }
+            //日志
+            OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
         }
-        //日志
-        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
         Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
     }
