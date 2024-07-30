@@ -6,6 +6,7 @@ use App\Enum\OrderEnum;
 use App\Exceptions\ErrorException;
 use App\Http\Resources\OrderResource;
 use App\Mail\MailCustom;
+use App\Mail\OrderNodeMail;
 use App\Models\Bank;
 use App\Models\Container;
 use App\Models\ContainerDetail;
@@ -25,6 +26,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use League\Flysystem\Config;
 
 class OrderLogic extends Logic
 {
@@ -438,7 +440,10 @@ class OrderLogic extends Logic
         }
         //日志
         OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
-        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
+        Mail::send(
+            new OrderNodeMail($to, $subject, $content, $request['file'] ?? [])
+        );
+//        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
     }
 
