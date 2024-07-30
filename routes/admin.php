@@ -54,6 +54,7 @@ Route::group([
         //顾客
         Route::group(['prefix' => 'customer'], function (){
             Route::get('list', 'CustomerController@list');
+            Route::get('detail', 'CustomerController@detail');
             Route::post('save', 'CustomerController@save');
             Route::post('delete', 'CustomerController@delete');
         });

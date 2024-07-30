@@ -20,6 +20,11 @@ class CustomerLogic extends Logic
         return $query->get();
     }
 
+    public static function detail($request)
+    {
+        return Customer::find($request['id']);
+    }
+
     public static function save($request)
     {
        return Customer::query()->findOrNew($request['id'] ?? 0)->fill($request->all())->save();

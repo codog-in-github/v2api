@@ -16,6 +16,12 @@ class CustomerController extends Controller
        return $this->success($res);
     }
 
+    public function detail(Request $request)
+    {
+       $res = CustomerLogic::detail($request);
+       return $this->success($res);
+    }
+
     public function save(CustomerRequest $request)
     {
         return $this->success(CustomerLogic::save($request));
