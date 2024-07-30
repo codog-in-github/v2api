@@ -58,6 +58,14 @@ class OrderFiles
       }
     }
 
+    public function tryToFilePathAbsolute(string $HTTPURI): string
+    {
+        try {
+            return $this->BASE_DIR. $this->toFilePath($HTTPURI);
+        } catch(\Exception $e) {
+            return $HTTPURI;
+        }
+    }
 
     public function getAsHttpURI(int $orderId, bool $group = false): array
     {

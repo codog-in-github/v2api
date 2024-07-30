@@ -31,11 +31,12 @@ class OrderNodeMail extends Mailable
         config([
             "mail.mailers.user:$user->id" => $config
         ]);
-        $this->mailer("mail.mailers.user:$user->id");
+        $this->mailer("user:$user->id");
+        $this->from($user->email);
         $this->to($to);
         $this->subject = $subject;
         $this->content = $content;
-        $this->files = array_map([\App\Utils\Order\OrderFiles::getInstance(), 'tryToFilePath'], $files);
+        $this->files = array_map([\App\Utils\Order\OrderFiles::getInstance(), 'tryToFilePathAbsolute'], $files);
     }
 
     /**
@@ -50,7 +51,8 @@ class OrderNodeMail extends Mailable
         }
 
         return $this->text('emails.custom')
-            ->with(['content' => $this->content]);
+          ->subject($this->subject)
+          ->with(['content' => $this->content]);
 
     }
 }
