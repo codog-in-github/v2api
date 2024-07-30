@@ -12,10 +12,11 @@ class OrderOperateLog extends Model
     const TYPE_CHANGE_ORDER = 4; //日志类型 改单申请
     protected $guarded = [];
 
-    static public function writeLog($order_id, $type, $content = '')
+    static public function writeLog($order_id, $nodeId, $type, $content = '')
     {
         self::query()->create([
             'order_id' => $order_id,
+            'node_id' => $nodeId,
             'type' => $type,
             'operator' => auth('user')->user()->name,
             'operate_at' => date('Y-m-d H:i:s'),

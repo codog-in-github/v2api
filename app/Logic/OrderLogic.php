@@ -390,60 +390,60 @@ class OrderLogic extends Logic
     }
 
     /**
-     * 发送邮件
+     * 节点完成邮件发送
      * @param $request
      * @return string
      */
     public static function sendEmail($request)
     {
-        if ($request['book_id']){
-            $book = RequestBook::query()->find($request['book_id']);
-            if (!$book){
-                throw new ErrorException('リクエスト情報が間違っています');
-            }
+        $nodeId = $request['node_id'];
+        if(!$nodeId) {
+            throw new \Exception('节点ID不能为空');
         }
-//        if ($request['file']){
-//            //校验附件是否是pdf
-//            foreach ($request['file'] as $file){
-//                if (strstr($file, '/pdfs/')){
-//
-//                }
-//            }
-//        }
-        $subject = $request['subject'];
-        $content = $request['content'];//邮件内容
-        $to = is_array($request['to']) ? $request['to'] : explode(',', $request['to']);
-        $from = auth('user')->user()->email ?? env('MAIL_FROM_ADDRESS');
-        $name = auth('user')->user()->name ?? env('MAIL_FROM_NAME');
-        if ($request['node_id']){
-            $node = OrderNode::query()->where('id', $request['node_id'])->first();
-            $node->update([
-                'mail_status'   => 1,
-                'mail_at'       => date('Y-m-d H:i:s'),
-                'sender'        => auth('user')->user()->name
-            ]);
-            //如果是SUR 到下一步
-            if ($node['node_id'] == OrderNode::TYPE_SUR){
-                $node->step += 1;
-                $node->save();
-            }
-
-            if ($node['node_id'] == OrderNode::TYPE_REQUEST){
-                //请求书节点
-                $exists = RequestBook::query()->where([
-                    'order_id' => $node->order_id,
-                    'is_confirm' => 1
-                ])->exists();
-                if (!$exists){
-                    OrderNode::changeNodeConfirm($node->order_id, OrderNode::TYPE_REQUEST, 1);
-                }
-            }
+        $node = OrderNode::findOrFail($nodeId);
+        $order = Order::findOrFail($node->order_id);
+        $updateData = [
+            'mail_status'  => 1,
+            'mail_at'      => date('Y-m-d H:i:s'),
+            'sender'       => auth('user')->user()->name,
+            'step'         => $node->step += 1,
+        ];
+        if(
+            in_array($node->node_id, [
+                OrderNode::TYPE_BK,
+                OrderNode::TYPE_TRANSPORT_COMPANY,
+                OrderNode::TYPE_PO,
+                OrderNode::TYPE_DRIVER_NOTIFICATION,
+                OrderNode::TYPE_CUSTOMER_DOCUMENTS
+            ])
+        ) {
+            $updateData['is_confirm'] = 1;
+        } elseif ($node->node_id == OrderNode::TYPE_REQUEST) {
+            // todo 发送邮件文件是否是已导出的请求书 全部已发送 结束节点
         }
-        //日志
-        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
-        $mail = new OrderNodeMail($to, $subject, $content, $request['file'] ?? []);
-        Mail::mailer($mail->mailer)->send($mail);
-//        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
+        $node->update($updateData);
+        $node->save();
+        $user = auth('user')->user();
+        // 邮件发送
+        $nodeOptData = [
+            'to' => is_array($request['to']) ? $request['to'] : explode(',', $request['to']),
+            'user' => $user->name,
+            'user_id' => $user->id,
+            'context' => $request['content'] ?? '',
+            'files' => $request['files'] ?? [],
+            'order_id' => $order->id,
+            'node_id' => $node->node_id,
+            'subject' => $request['subject']
+        ];
+        $mail = new OrderNodeMail($nodeOptData['to'], $nodeOptData['subject'], $nodeOptData['context'], $nodeOptData['files']);
+        OrderOperateLog::writeLog(
+            $node->order_id,
+            $node->id,
+            OrderOperateLog::TYPE_MAIL,
+            json_encode($nodeOptData)
+        );
+//        Mail::mailer($mail->mailer)->send($mail);
+        // 节点操作日志
         return 'success';
     }
 
@@ -451,7 +451,10 @@ class OrderLogic extends Logic
     public static function changeNodeStatus($request)
     {
         $orderNode = OrderNode::query()->findOrFail($request['id']);
-        //todo 已经送信了能关闭吗
+        // 进行中或者完成的节点状态不能修改
+        if($orderNode->mail_status) {
+            throw new \Exception('コンシステント状態');
+        }
         if ($orderNode->node_id == 11){
             //todo 如果是 请 这个节点 需要向会计发起申请
 
@@ -461,7 +464,6 @@ class OrderLogic extends Logic
         $orderNode->save();
         return $orderNode;
     }
-
     //置顶 取消置顶
     public static function changeTop($request)
     {
@@ -472,10 +474,16 @@ class OrderLogic extends Logic
         $orderNode->is_top = $request['is_top'];
         if ($request['is_top']){
             $orderNode->top_at = date('Y-m-d H:i:s');
+            $orderNode->top_finish_at = date('Y-m-d H:i:s', time() + 60 * 60);
         }
         $orderNode->save();
         $content = json_encode($request->all());
-        OrderOperateLog::writeLog($orderNode->order_id, OrderOperateLog::TYPE_NODE_TOP);
+        OrderOperateLog::writeLog(
+            $orderNode->order_id,
+            $orderNode->id,
+            OrderOperateLog::TYPE_NODE_TOP,
+            $content
+        );
         return $orderNode;
     }
 
@@ -533,7 +541,12 @@ class OrderLogic extends Logic
         $node->is_enable = 0;
         $node->save();
         $content = json_encode($request->all());
-        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_NODE_CONFIRM, $content);
+        OrderOperateLog::writeLog(
+            $node->order_id,
+            $node->id,
+            OrderOperateLog::TYPE_NODE_CONFIRM,
+            $content
+        );
         return $node->fresh();
     }
 
@@ -548,8 +561,14 @@ class OrderLogic extends Logic
             throw new ErrorException('未確認、修正の必要なし');
         }
         $content = json_encode($request->all());
-        OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_CHANGE_ORDER, $content);
+        OrderOperateLog::writeLog(
+            $node->order_id,
+            $node->id,
+            OrderOperateLog::TYPE_CHANGE_ORDER,
+            $content
+        );
         $node->has_change_order = true;
+        $node->step = 0;
         if ($node->node_id = OrderNode::TYPE_BL_COPY){
             $now = Carbon::now();
             $node->is_top = 1;
