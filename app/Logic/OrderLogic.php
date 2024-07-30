@@ -440,9 +440,8 @@ class OrderLogic extends Logic
         }
         //日志
         OrderOperateLog::writeLog($node->order_id, OrderOperateLog::TYPE_MAIL, $content);
-        Mail::send(
-            new OrderNodeMail($to, $subject, $content, $request['files'] ?? [])
-        );
+        $mail = new OrderNodeMail($to, $subject, $content, $request['file'] ?? []);
+        Mail::mailer($mail->mailer)->send($mail);
 //        Mail::to($to)->send(new MailCustom($subject, $content, $from, $name, $request['file'] ?? []));
         return 'success';
     }
