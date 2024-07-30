@@ -13,6 +13,7 @@ use App\Models\ContainerDetail;
 use App\Models\CustomCompany;
 use App\Models\Customer;
 use App\Models\Filter\OrderFilter;
+use App\Models\MailTemplate;
 use App\Models\NodeConfig;
 use App\Models\Order;
 use App\Models\OrderFile;
@@ -562,6 +563,16 @@ class OrderLogic extends Logic
             OrderNode::changeNodeEnable($node->order_id, OrderNode::TYPE_FM, 1);
         }
         return $node->save();
+    }
+
+
+    public static function mailTemplate($request)
+    {
+        $template = MailTemplate::query()->where('type', $request['type'])->first();
+        if (!$template){
+            throw new ErrorException('邮件模板不存在');
+        }
+        return MailTemplate::render($template, $request['type'], $request['order_id']);
     }
 
     //保存集装箱信息

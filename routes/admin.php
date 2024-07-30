@@ -84,6 +84,7 @@ Route::group([
             Route::get('un_read_message_num', 'OrderController@unReadMessageNum');//我的消息数量
             Route::get('node_confirm', 'OrderController@nodeConfirm');//订单确认
             Route::get('change_order_request', 'OrderController@changeOrderRequest');//改单申请
+            Route::get('mail_template', 'OrderController@mailTemplate');//邮件模板
         });
 
         //请求书

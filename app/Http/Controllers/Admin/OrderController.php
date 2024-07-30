@@ -202,6 +202,11 @@ class OrderController extends Controller
         return $this->success(OrderLogic::changeOrderRequest($request));
     }
 
+    public function mailTemplate(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::mailTemplate($request));
+    }
+
     public function bkgTypeText()
     {
         $list = OrderEnum::BKG_TYPE_TEXT_ARR;

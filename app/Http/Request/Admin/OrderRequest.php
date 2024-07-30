@@ -104,6 +104,11 @@ class OrderRequest extends FormRequest
                     'id'        => 'required',
                     'is_top'    => 'required|in:0,1',
                 ];
+            case 'admin/order/mail_template':
+                return [
+                    'order_id'        => 'required',
+                    'type'    => 'required|in:1,13',
+                ];
             default:
                 return [];
         }
