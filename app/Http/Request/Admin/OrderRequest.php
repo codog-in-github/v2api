@@ -85,9 +85,6 @@ class OrderRequest extends FormRequest
             case 'admin/order/send_email':
                 return [
                     'order_id'  => 'required',
-                    'subject'   => 'required|string',
-                    'content'   => 'required|string',
-                    'to'        => 'required',
                 ];
             case 'admin/order/change_node_status':
                 return [
