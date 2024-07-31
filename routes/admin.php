@@ -39,6 +39,7 @@ Route::group([
 
         //管理员
         Route::group(['prefix' => 'user'], function (){
+            Route::get('me', 'UserController@me');
             Route::get('destroy', 'UserController@destroy');
             Route::get('user_list', 'UserController@userList');
         });

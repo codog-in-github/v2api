@@ -68,4 +68,9 @@ class UserController extends Controller
         $list = $query->select('id', 'username', 'role_id', 'name', 'tag', 'enable')->get();
         return $this->success($list);
     }
+
+    public function me()
+    {
+        return $this->success(\auth('user')->user());
+    }
 }

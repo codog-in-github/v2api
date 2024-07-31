@@ -28,15 +28,15 @@ class StringRender
 //        $obLevel = ob_get_level();
         ob_start();
         extract($__data, EXTR_SKIP);
-        try {
+//        try {
             $replaced = str_replace('-&gt;', '->', $__compiled);
             $replaced = str_replace('<u>', '', $replaced);
             $replaced = str_replace('</u>', '', $replaced);
             $replaced = str_replace('\\', '', $replaced);
             eval('?> ' . $replaced);
-        } catch (Exception $e) {
-            throw new ErrorException($e->getMessage());
-        }
+//        } catch (Exception $e) {
+//            throw new ErrorException($e->getMessage());
+//        }
 
         return ltrim(ob_get_clean());
     }
