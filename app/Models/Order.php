@@ -62,6 +62,11 @@ class Order extends Model
         return $this->belongsTo(Option::class, 'carrier_id', 'id');
     }
 
+    public function customCom()
+    {
+        return $this->belongsTo(CustomCompany::class, 'custom_com_id', 'id');
+    }
+
     public function requestBooks()
     {
         return $this->hasMany(RequestBook::class, 'order_id', 'id')->latest();

@@ -11,9 +11,10 @@ class MailTemplate extends Model
 
     static public function render($template, $nodeId, $orderId)
     {
-        $order = Order::query()->find($orderId);
-        $subject = app(StringRender::class)->renderString($template->subject, ['type' => 'ces', 'quantity' => 10]);
-        $content = app(StringRender::class)->renderString($template->content, ['order' => $order]);
-        return compact('subject', 'content');
+        $order = Order::query()->with(['containers', 'containers.details',  'customCom'])->find($orderId);
+        $subject = app(StringRender::class)->renderString($template->subject, ['order' => $order]);
+        dd($subject);
+//        $content = app(StringRender::class)->renderString($template->content, ['order' => $order]);
+//        return compact('subject', 'content');
     }
 }
