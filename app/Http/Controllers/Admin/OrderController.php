@@ -180,6 +180,15 @@ class OrderController extends Controller
         return $this->success(OrderLogic::sendEmail($request));
     }
 
+    /**
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function emailLogs(OrderRequest $request)
+    {
+        return $this->success(OrderLogic::emailLogs($request));
+    }
+
     public function changeNodeStatus(OrderRequest $request)
     {
         return $this->success(OrderLogic::changeNodeStatus($request));

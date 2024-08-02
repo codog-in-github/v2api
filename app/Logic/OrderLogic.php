@@ -448,6 +448,12 @@ class OrderLogic extends Logic
     }
 
 
+    public static function emailLogs($request)
+    {
+        return OrderOperateLog::query()->where('node_id', '=', $request['id'])->get();
+    }
+
+
     public static function changeNodeStatus($request)
     {
         $orderNode = OrderNode::query()->findOrFail($request['id']);
