@@ -108,11 +108,7 @@ class OrderLogic extends Logic
         $customer = Customer::query()->find($request['customer_id']);
         $order = (new Order())->fill($customer->toArray() ?? [])->fill($request->only('bkg_type', 'remark'));
 
-        $res = Order::createBkgNo();
-        $order->order_no =  $res['orderNo'];
         $order->bkg_date = date('Y-m-d');
-        $order->month = $res['month'];
-        $order->month_no = $res['mothNo'];
         $order->creator = auth('user')->user()->username;
         DB::beginTransaction();
         try {
@@ -163,6 +159,12 @@ class OrderLogic extends Logic
         DB::beginTransaction();
         try {
             $order->fill($request->all());
+            if ($order->cy_cut && $order->custom_com_id && $order->bkg_no && !$order->order_no){
+                $res = Order::createBkgNo();
+                $order->order_no =  $res['orderNo'];
+                $order->month = $res['month'];
+                $order->month_no = $res['mothNo'];
+            }
             if ($order->isDirty('bkg_type') && $order->getOriginal('bkg_type') == 0) {
                 $order->bkg_type_text = OrderEnum::BKG_TYPE_TEXT_ARR[$request['bkg_type']] ?? '';
                 self::createNode($order, $request['node_ids'] ?? []);
