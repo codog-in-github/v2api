@@ -31,6 +31,7 @@ use League\Flysystem\Config;
 
 class OrderLogic extends Logic
 {
+    //1 4 5 6 7 8 9
     public static function tabOrderList(Request $request)
     {
         if (!is_numeric($request['status'])){
@@ -99,7 +100,6 @@ class OrderLogic extends Logic
             ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
                 'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id', 'created_at')
             ->latest()->paginate($request['page_size'] ?? 10);
-        //todo
         return $list;
     }
 

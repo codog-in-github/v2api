@@ -14,6 +14,11 @@ class ContainerDetail extends Model
         return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
+    public function nodes()
+    {
+        return $this->hasMany(OrderNode::class, 'order_id', 'order_id')->orderBy('sort');
+    }
+
     /**
      * PO DRIVE节点根据交付时间获取预警颜色
      * @param $time

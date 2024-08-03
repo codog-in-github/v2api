@@ -9,6 +9,7 @@ class ContainerDetailLogic extends Logic
 {
     public static function list($request)
     {
+        $nodeId = Order::getNodeId($request['node_status']);
         $query = ContainerDetail::query()->with('order')
             ->whereHas('order', function ($query)use($request){
                 //订单大状态0未开始 1进行中 2已完成 3 订单终止
@@ -16,6 +17,16 @@ class ContainerDetailLogic extends Logic
                     $query->where('status', $request['status']);
                 }
             });
+        if ($request['node_status']){
+            $query->whereHas('nodes', function ($query)use($nodeId){
+                if (is_array($nodeId)){
+                    $query->whereIn('node_id', $nodeId);
+                }else{
+                    $query->where('node_id', $nodeId);
+                }
+                $query->where('is_enable', 1);
+            });
+        }
         $list = $query->orderBy('deliver_time')->paginate($request['page_size'] ?? 20);
         foreach ($list as $item){
             $item->loading_country_name = $item->order->loading_country_name; //装柜国家
