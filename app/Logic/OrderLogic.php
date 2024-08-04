@@ -59,7 +59,7 @@ class OrderLogic extends Logic
             ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
                 'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id');
         if ($request['status'] == OrderEnum::STATUS_ING){
-            $list = $query->latest()->get();
+            $list = $query->latest()->get()->toArray();
             if ($request['node_status'] && in_array($request['node_status'], [4,5,6,7])){
                 foreach ($list as $value){
                     $value['color'] = Order::getColor($request['node_status'], $value);
