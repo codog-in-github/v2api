@@ -6,6 +6,7 @@ use App\Enum\CodeEnum;
 use App\Models\Filter\BaseFilter;
 use App\Models\Filter\OrderFilter;
 use App\Utils\HolidayJp\Calendar;
+use App\Utils\Order\OrderNum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -74,12 +75,11 @@ class Order extends Model
     public static function createBkgNo()
     {
         $month = date('m');
-        $mothNo = self::query()->where('month', '07')->latest()->value('month_no') ?? 99;
-        $preg = "/[349]|(?:001)/";
-        do {
-            $mothNo++;
-        } while (preg_match($preg, $mothNo));
-        $orderNo = date('Ym') . $mothNo . config('order')['tag'];
+        $mothNo = self::query()->where('month', $month)->latest()->value('month_no') ?? 99;
+        $orderNum = new OrderNum($mothNo);
+        $newNum = $orderNum->next()->toInt();
+        $start = auth('user')->user()->department ? auth('user')->user()->department . '-' : '';
+        $orderNo = $start . date('Ym') . $newNum . config('order')['tag'];
         return compact('orderNo', 'month', 'mothNo');
     }
 

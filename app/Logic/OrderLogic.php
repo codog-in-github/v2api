@@ -31,6 +31,7 @@ use League\Flysystem\Config;
 
 class OrderLogic extends Logic
 {
+    //1 4 5 6 7 8 9
     public static function tabOrderList(Request $request)
     {
         if (!is_numeric($request['status'])){
@@ -99,7 +100,6 @@ class OrderLogic extends Logic
             ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
                 'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id', 'created_at')
             ->latest()->paginate($request['page_size'] ?? 10);
-        //todo
         return $list;
     }
 
@@ -108,11 +108,7 @@ class OrderLogic extends Logic
         $customer = Customer::query()->find($request['customer_id']);
         $order = (new Order())->fill($customer->toArray() ?? [])->fill($request->only('bkg_type', 'remark'));
 
-        $res = Order::createBkgNo();
-        $order->order_no =  $res['orderNo'];
         $order->bkg_date = date('Y-m-d');
-        $order->month = $res['month'];
-        $order->month_no = $res['mothNo'];
         $order->creator = auth('user')->user()->username;
         DB::beginTransaction();
         try {
@@ -163,6 +159,12 @@ class OrderLogic extends Logic
         DB::beginTransaction();
         try {
             $order->fill($request->all());
+            if ($order->cy_cut && $order->custom_com_id && $order->bkg_no && !$order->order_no){
+                $res = Order::createBkgNo();
+                $order->order_no =  $res['orderNo'];
+                $order->month = $res['month'];
+                $order->month_no = $res['mothNo'];
+            }
             if ($order->isDirty('bkg_type') && $order->getOriginal('bkg_type') == 0) {
                 $order->bkg_type_text = OrderEnum::BKG_TYPE_TEXT_ARR[$request['bkg_type']] ?? '';
                 self::createNode($order, $request['node_ids'] ?? []);
