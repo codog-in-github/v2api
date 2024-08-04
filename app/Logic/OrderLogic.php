@@ -114,7 +114,7 @@ class OrderLogic extends Logic
      */
     public static function orderList(Request $request)
     {
-        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')->with('cont')
+        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')->with('nodes')
             ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
                 'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id', 'created_at')
             ->latest()->paginate($request['page_size'] ?? 10);
@@ -349,25 +349,11 @@ class OrderLogic extends Logic
      */
     public static function getListByCalendar($request)
     {
-        switch ($request['type']){
-            case 1 :
-                $start = Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->subWeek()->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
-                break;
-            case 3 :
-                $start = Carbon::now()->addWeek(1)->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->addWeek(1)->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
-                break;
-            default :
-                $start = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
-                $end = Carbon::now()->startOfWeek()->addDays(4)->format('Y-m-d H:i:s');
-                break;
-        }
         $query = Order::query()
             ->withCount('containers')
-            ->whereBetween('cy_cut', [$start, $end])
+            ->whereBetween('cy_cut', [$request['start'], $request['end']])
             ->select(['id', 'cy_cut', 'bkg_type', 'company_name', 'short_name', 'loading_country_name',
-                'loading_port_name', 'delivery_country_name', 'delivery_port_name']);
+                'loading_port_name', 'delivery_country_name', 'delivery_port_name', 'bkg_no']);
         if ($request['bkg_type']){
             $query->where('bkg_type', $request['bkg_type']);
         }
