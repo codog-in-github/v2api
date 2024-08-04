@@ -4,6 +4,7 @@ namespace App\Logic;
 use App\Models\Bank;
 use App\Models\ContainerDetail;
 use App\Models\Order;
+use App\Models\OrderNode;
 
 class ContainerDetailLogic extends Logic
 {

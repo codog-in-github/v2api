@@ -31,7 +31,6 @@ use League\Flysystem\Config;
 
 class OrderLogic extends Logic
 {
-
     public static function topList() {
         $query = OrderNode::query()->with('order');
         $query->where([
@@ -39,7 +38,6 @@ class OrderLogic extends Logic
             'is_confirm' => 0
         ]);
         $topList = $query->orderBy('top_at', 'desc')->get();
-        DB::enableQueryLog();
         $noSend = OrderNode::query()->with('order')
             ->whereIn('order_node.node_id', [OrderNode::TYPE_BK, OrderNode::TYPE_TRANSPORT_COMPANY])
             ->groupBy('id')
@@ -116,7 +114,7 @@ class OrderLogic extends Logic
      */
     public static function orderList(Request $request)
     {
-        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')
+        $list = Order::query()->filter(new OrderFilter($request))->with('requestBooks')->with('cont')
             ->select('id', 'order_type', 'bkg_no', 'order_no', 'cy_cut', 'doc_cut', 'loading_country_name', 'loading_port_name', 'company_name',
                 'delivery_country_name', 'delivery_port_name', 'remark', 'status', 'apply_num', 'voyage', 'vessel_name', 'carrier', 'customer_id', 'created_at')
             ->latest()->paginate($request['page_size'] ?? 10);
