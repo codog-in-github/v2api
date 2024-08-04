@@ -69,6 +69,10 @@ class OrderNode extends Model
     protected $table = 'order_node';
     protected $guarded = [];
 
+    public function order(){
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
     public static function changeNodeEnable($orderId, $nodeId, $enable){
         return self::query()->where([
             'order_id' => $orderId,

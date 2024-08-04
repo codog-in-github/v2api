@@ -24,17 +24,16 @@ class ContainerDetail extends Model
      * @param $time
      * @return int
      */
-    static public function getWarningColor($time)
+    static public function getWarningColor($time, $nodeType = 1)
     {
         $diff = Carbon::now()->diffInDays($time);
-        if ($diff <= config('order')['loading_warning_days']['red']){
-            return 1;
+        $warringTypes = Order::getWarningType($nodeType);
+        for($i = 0; $i < count($warringTypes); $i++) {
+            if ($diff <= $warringTypes[$i]){
+                return $i;
+            }
         }
-        if ($diff <= config('order')['loading_warning_days']['yellow']){
-            return 2;
-        }
-        return 3;
+        return count($warringTypes);
     }
-
 
 }

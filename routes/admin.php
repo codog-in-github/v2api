@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,32 +62,33 @@ Route::group([
         });
         //订单
         Route::group(['prefix' => 'order'], function (){
-            Route::get('list', 'OrderController@orderList');
-            Route::get('tab_order_list', 'OrderController@tabOrderList'); //tab页特殊订单列表
-            Route::post('create', 'OrderController@createOrder');
-            Route::get('detail', 'OrderController@detail');
-            Route::post('edit_order', 'OrderController@editOrder');
-            Route::post('delete', 'OrderController@delete');
-            Route::post('save_file', 'OrderController@saveFile'); //保存附件
-            Route::post('del_file', 'OrderController@delFile'); //删除附件
-            Route::post('send_message', 'OrderController@sendMessage'); //留言
-            Route::get('message_list', 'OrderController@messageList'); //留言列表
-            Route::post('read_message', 'OrderController@readMessage'); //留言已读
-            Route::get('get_custom_com', 'OrderController@getCustomCom'); //报关公司列表
-            Route::get('container_list', 'OrderController@containerList'); //集装箱列表
-            Route::get('list_by_calendar', 'OrderController@getListByCalendar'); //订单按日历列表
-            Route::get('list_by_ship', 'OrderController@getListByShip'); //订单按日历列表
-            Route::post('update_ship_schedule', 'OrderController@updateShipSchedule'); //船期更新
-            Route::post('send_email', 'OrderController@sendEmail'); //批量发送邮件
-            Route::get('email_log', 'OrderController@emailLogs'); //批量发送邮件
-            Route::post('change_node_status', 'OrderController@changeNodeStatus'); //节点开关闭
-            Route::post('change_top', 'OrderController@changeTop'); //置顶
+            Route::get('list', [OrderController::class, 'orderList']);
+            Route::get('top_list', [OrderController::class, 'topOrderList']); //top页特殊订单列表
+            Route::get('tab_order_list', [OrderController::class, 'tabOrderList']); //tab页特殊订单列表
+            Route::post('create', [OrderController::class, 'createOrder']);
+            Route::get('detail', [OrderController::class, 'detail']);
+            Route::post('edit_order', [OrderController::class, 'editOrder']);
+            Route::post('delete', [OrderController::class, 'delete']);
+            Route::post('save_file', [OrderController::class, 'saveFile']); //保存附件
+            Route::post('del_file', [OrderController::class, 'delFile']); //删除附件
+            Route::post('send_message', [OrderController::class, 'sendMessage']); //留言
+            Route::get('message_list', [OrderController::class, 'messageList']); //留言列表
+            Route::post('read_message', [OrderController::class, 'readMessage']); //留言已读
+            Route::get('get_custom_com', [OrderController::class, 'getCustomCom']); //报关公司列表
+            Route::get('container_list', [OrderController::class, 'containerList']); //集装箱列表
+            Route::get('list_by_calendar', [OrderController::class, 'getListByCalendar']); //订单按日历列表
+            Route::get('list_by_ship', [OrderController::class, 'getListByShip']); //订单按日历列表
+            Route::post('update_ship_schedule', [OrderController::class, 'updateShipSchedule']); //船期更新
+            Route::post('send_email', [OrderController::class, 'sendEmail']); //批量发送邮件
+            Route::get('email_log', [OrderController::class, 'emailLogs']); //批量发送邮件
+            Route::post('change_node_status', [OrderController::class, 'changeNodeStatus']); //节点开关闭
+            Route::post('change_top', [OrderController::class, 'changeTop']); //置顶
 //            Route::post('copy_order', 'OrderController@copyOrder'); //类似事件
-            Route::get('bkg_type_text', 'OrderController@bkgTypeText');//订单类型
-            Route::get('un_read_message_num', 'OrderController@unReadMessageNum');//我的消息数量
-            Route::get('node_confirm', 'OrderController@nodeConfirm');//订单确认
-            Route::get('change_order_request', 'OrderController@changeOrderRequest');//改单申请
-            Route::get('mail_template', 'OrderController@mailTemplate');//邮件模板
+            Route::get('bkg_type_text', [OrderController::class, 'bkgTypeText']);//订单类型
+            Route::get('un_read_message_num', [OrderController::class, 'unReadMessageNum']);//我的消息数量
+            Route::get('node_confirm', [OrderController::class, 'nodeConfirm']);//订单确认
+            Route::get('change_order_request', [OrderController::class, 'changeOrderRequest']);//改单申请
+            Route::get('mail_template', [OrderController::class, 'mailTemplate']);//邮件模板
         });
 
         //请求书

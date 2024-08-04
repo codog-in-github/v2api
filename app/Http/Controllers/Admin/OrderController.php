@@ -29,6 +29,11 @@ class OrderController extends Controller
         $res = OrderLogic::tabOrderList($request);
         return $this->success($res);
     }
+    public function topOrderList(Request $request)
+    {
+        $res = OrderLogic::topList();
+        return $this->success($res);
+    }
 
     /**
      * 集装箱列表

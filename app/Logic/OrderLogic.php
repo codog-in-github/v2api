@@ -31,6 +31,26 @@ use League\Flysystem\Config;
 
 class OrderLogic extends Logic
 {
+
+    public static function topList() {
+        $query = OrderNode::query()->with('order');
+        $query->where([
+            'is_top' => 1,
+            'is_confirm' => 0
+        ]);
+        $topList = $query->orderBy('top_at', 'desc')->get();
+        DB::enableQueryLog();
+        $noSend = OrderNode::query()->with('order')
+            ->whereIn('order_node.node_id', [OrderNode::TYPE_BK, OrderNode::TYPE_TRANSPORT_COMPANY])
+            ->groupBy('id')
+            ->havingRaw("sum(is_enable) > sum(is_confirm)")->get();
+        $tempOrder = Order::query()->where('bkg_no', '')->get();
+        return [
+            'top' => $topList,
+            'tmp' => $tempOrder,
+            'no_send' => $noSend
+        ];
+    }
     //1 4 5 6 7 8 9
     public static function tabOrderList(Request $request)
     {
@@ -475,23 +495,30 @@ class OrderLogic extends Logic
     //置顶 取消置顶
     public static function changeTop($request)
     {
-        $orderNode = OrderNode::query()->findOrFail($request['id']);
+        $nodeType = Order::getNodeId($request['node_status']);
+        if(is_array($nodeType)) {
+            $nodeType = $nodeType[0];
+        }
+        $orderNode = OrderNode::query()->where([
+            'order_id' => $request['id'],
+            'node_id' => $nodeType
+        ])->firstOrFail();
         if ($orderNode->is_top == $request['is_top']){
             throw new ErrorException('コンシステント状態');
         }
         $orderNode->is_top = $request['is_top'];
         if ($request['is_top']){
             $orderNode->top_at = date('Y-m-d H:i:s');
-            $orderNode->top_finish_at = date('Y-m-d H:i:s', time() + 60 * 60);
+            $orderNode->top_finish_time = date('Y-m-d H:i:s', time() + 60 * 60);
         }
         $orderNode->save();
-        $content = json_encode($request->all());
-        OrderOperateLog::writeLog(
-            $orderNode->order_id,
-            $orderNode->id,
-            OrderOperateLog::TYPE_NODE_TOP,
-            $content
-        );
+//        $content = json_encode($request->all());
+//        OrderOperateLog::writeLog(
+//            $orderNode->order_id,
+//            $orderNode->id,
+//            OrderOperateLog::TYPE_NODE_TOP,
+//            $content
+//        );
         return $orderNode;
     }
 

@@ -87,30 +87,23 @@ class Order extends Model
     public static function getColor($nodeStatus, $order)
     {
         //3DRIVE 4通关资料 5ACL 6许可 7 B/C 8SUR 9请求书
-        switch ($nodeStatus){
-            case 3:
-            case 4:
-            case 6:
-                $start = Carbon::now();
-                $end = Carbon::parse($order->cy_cut);
-                if ($start >= $end) return CodeEnum::COLOR_RED;
-                $diffDays = self::compareTwoTime($start, $end);
-                return $diffDays < 1 ? CodeEnum::COLOR_RED : ($diffDays <= 2 ? CodeEnum::COLOR_YELLOW : CodeEnum::COLOR_GREEN);
-            case 5:
-                $start = Carbon::now();
-                $end = Carbon::parse($order->doc_cut);
-                if ($start >= $end) return CodeEnum::COLOR_RED;
-                $diffDays = self::compareTwoTime($start, $end);
-                return $diffDays < 1 ? CodeEnum::COLOR_RED : ($diffDays <= 2 ? CodeEnum::COLOR_YELLOW : CodeEnum::COLOR_GREEN);
-            case 7:
-                $start = Carbon::parse($order->cy_cut);
-                $end = Carbon::now();
-                $diffDays = self::compareTwoTime($start, $end);
-                return $diffDays > 1 ? CodeEnum::COLOR_RED : ($diffDays >= 0 ? CodeEnum::COLOR_YELLOW : CodeEnum::COLOR_GREEN) ;
-            default:
-                return 1;
-        }
+        $start = Carbon::now();
+        $end = Carbon::parse($order->cy_cut);
+        $diffDays = self::compareTwoTime($start, $end);
+        return self::getWarningColor($diffDays, $nodeStatus);
     }
+
+    static public function getWarningColor($diffTime, $nodeType = 1)
+    {
+        $warringTypes = Order::getWarningType($nodeType);
+        for($i = 0; $i < count($warringTypes); $i++) {
+            if ($diffTime <= $warringTypes[$i]){
+                return $i;
+            }
+        }
+        return count($warringTypes);
+    }
+
 
     /**
      * 开始时间与结束时间对比 跳过周末节假期
@@ -147,23 +140,33 @@ class Order extends Model
             case 1:
                 return [1, 2];
             case 2:
-                return 3;
             case 3:
-                return 4;
             case 4:
-                return 5;
             case 5:
-                return 6;
             case 6:
-                return 7;
             case 7:
-                return 8;
             case 8:
-                return 10;
             case 9:
-                return 11;
+             return $nodeStatus + 1;
             default:
-                return 0;
+                throw new \Exception('参数错误');
+        }
+    }
+
+    public static function getWarningType($ndeStatus)
+    {
+        switch ($ndeStatus) {
+            case 1:
+                return [2, 3];
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                return [1, 2];
+            case 6:
+                return [-1, 0];
+            default:
+                return [];
         }
     }
 }
