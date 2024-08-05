@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\RequestBookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -93,13 +94,13 @@ Route::group([
 
         //请求书
         Route::group(['prefix' => 'request_book'], function (){
-            Route::get('detail', 'RequestBookController@detail');
-            Route::post('save', 'RequestBookController@save');
-            Route::post('delete', 'RequestBookController@delete');
-            Route::post('change_status', 'RequestBookController@changeStatus');
-            Route::post('export', 'RequestBookController@exportRequestBook');
-            Route::post('pdf_by_stream', 'RequestBookController@pdfByStream');
-            Route::post('copy', 'RequestBookController@copy');
+            Route::get('detail', [RequestBookController::class, 'detail']);
+            Route::post('save', [RequestBookController::class, 'save']);
+            Route::post('delete', [RequestBookController::class, 'delete']);
+            Route::post('change_status', [RequestBookController::class, 'changeStatus']);
+            Route::post('export', [RequestBookController::class, 'exportRequestBook']);
+            Route::post('pdf_by_stream', [RequestBookController::class, 'pdfByStream']);
+            Route::post('copy', [RequestBookController::class, 'copy']);
         });
     });
 });

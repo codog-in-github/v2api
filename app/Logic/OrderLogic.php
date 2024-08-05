@@ -3,6 +3,7 @@
 namespace App\Logic;
 use App\Enum\CodeEnum;
 use App\Enum\OrderEnum;
+use App\Events\OrderNodeChange;
 use App\Exceptions\ErrorException;
 use App\Http\Resources\OrderResource;
 use App\Mail\MailCustom;
@@ -448,6 +449,8 @@ class OrderLogic extends Logic
             OrderOperateLog::TYPE_MAIL,
             json_encode($nodeOptData)
         );
+
+        event(new OrderNodeChange($node));
 //        Mail::mailer($mail->mailer)->send($mail);
         // 节点操作日志
         return 'success';
@@ -474,6 +477,7 @@ class OrderLogic extends Logic
         }
         $orderNode->is_enable = $request['is_enable'];
         $orderNode->save();
+        event(new OrderNodeChange($orderNode));
         return $orderNode;
     }
     //置顶 取消置顶
@@ -557,8 +561,8 @@ class OrderLogic extends Logic
             throw new ErrorException('ノードが閉じました');
         }
         $node->is_confirm = $request['is_confirm'];
-        $node->is_enable = 0;
         $node->save();
+        event(new OrderNodeChange($node));
         $content = json_encode($request->all());
         OrderOperateLog::writeLog(
             $node->order_id,
@@ -566,6 +570,7 @@ class OrderLogic extends Logic
             OrderOperateLog::TYPE_NODE_CONFIRM,
             $content
         );
+        event(new OrderNodeChange($node));
         return $node->fresh();
     }
 
@@ -588,6 +593,7 @@ class OrderLogic extends Logic
         );
         $node->has_change_order = true;
         $node->step = 0;
+        $node->is_confirm = 0;
         if ($node->node_id = OrderNode::TYPE_BL_COPY){
             $now = Carbon::now();
             $node->is_top = 1;
@@ -600,7 +606,9 @@ class OrderLogic extends Logic
             //开启FM
             OrderNode::changeNodeEnable($node->order_id, OrderNode::TYPE_FM, 1);
         }
-        return $node->save();
+        $node->save();
+        event(new OrderNodeChange($node));
+        return 1;
     }
 
 

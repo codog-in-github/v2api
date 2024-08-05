@@ -14,6 +14,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Order extends Model
 {
     use SoftDeletes;
+
+    const STATUS_READY = 0;
+    const STATUS_IN_DO = 1;
+    const STATUS_FINISH = 2;
+    const STATUS_CANCEL = 3;
     protected $fillable = [
         'old_id', 'bkg_date', 'bkg_no', 'bl_no', 'bkg_type', 'month', 'month_no', 'tag', 'company_name', 'short_name',
         'zip_code', 'address', 'header', 'mobile', 'legal_number', 'carrier', 'c_staff', 'service', 'vessel_name', 'voyage',

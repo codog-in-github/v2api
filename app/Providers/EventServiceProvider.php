@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\OrderNodeChange;
+use App\Listeners\CheckFinishWhenNodeChange;
 use App\Models\Order;
 use App\Observers\OrderObserver;
 use Illuminate\Auth\Events\Registered;
@@ -17,9 +19,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
-        ],
+        OrderNodeChange::class => [
+            CheckFinishWhenNodeChange::class
+        ]
     ];
 
     /**

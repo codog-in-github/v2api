@@ -15,3 +15,4 @@ yarn-error.log
 /.vscode
 /public/*
 /nginx.htaccess
+/php_errors.log
